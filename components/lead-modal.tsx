@@ -80,6 +80,28 @@ export function LeadModal({
       return setError("Necesitamos tu autorización para contactarte.");
 
     startTransition(async () => {
+      // 1) Pick ejecutivo PRIMERO para registrarlo en el INSERT.
+      const { data: ejecutivos } = await supabase
+        .from("ejecutivos_publicos")
+        .select("id, telefono_whatsapp, nombre, ciudad, gerencia, prioridad")
+        .eq("activo", true)
+        .order("prioridad", { ascending: true });
+
+      // Round-robin: random pick entre los activos para esa ciudad.
+      // Fallback a globales (ciudad NULL) si no hay específicos.
+      const candidatos = ejecutivos ?? [];
+      const porCiudad = candidatos.filter((e) => e.ciudad === ciudad);
+      const globales = candidatos.filter((e) => !e.ciudad);
+      const pool =
+        porCiudad.length > 0
+          ? porCiudad
+          : globales.length > 0
+            ? globales
+            : candidatos;
+      const ejecutivoCiudad =
+        pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null;
+
+      // 2) INSERT solicitud incluyendo el ejecutivo asignado.
       const { data: solicitud, error: insertError } = await supabase
         .from("solicitudes_compra")
         .insert({
@@ -90,6 +112,8 @@ export function LeadModal({
           comentarios: comentarios.trim() || null,
           fuente: "catalogo_web",
           estatus: "nuevo",
+          ejecutivo_asignado: ejecutivoCiudad?.nombre ?? null,
+          gerencia_asignada: ejecutivoCiudad?.gerencia ?? null,
           user_agent:
             typeof navigator !== "undefined" ? navigator.userAgent : null,
         })
@@ -103,15 +127,6 @@ export function LeadModal({
         );
         return;
       }
-
-      const { data: ejecutivos } = await supabase
-        .from("ejecutivos_publicos")
-        .select("telefono_whatsapp, nombre, ciudad, prioridad")
-        .eq("activo", true)
-        .order("prioridad", { ascending: true });
-
-      const ejecutivoCiudad =
-        ejecutivos?.find((e) => e.ciudad === ciudad) ?? ejecutivos?.[0];
 
       if (!ejecutivoCiudad?.telefono_whatsapp) {
         window.location.href = `/solicitud/${solicitud.id}`;
