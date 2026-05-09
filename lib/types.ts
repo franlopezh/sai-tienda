@@ -1,0 +1,65 @@
+export type Categoria = {
+  id: string;
+  nombre: string;
+  slug: string;
+  icono?: string | null;
+  orden?: number | null;
+  activa?: boolean;
+};
+
+export type Producto = {
+  id: string;
+  slug: string;
+  nombre: string;
+  descripcion?: string | null;
+  categoria_id: string;
+  precio_contado: number;
+  precio_credito: number;
+  imagen_url?: string | null;
+  imagenes?: string[] | null;
+  marca?: string | null;
+  modelo?: string | null;
+  ficha_tecnica_url?: string | null;
+  stock?: number | null;
+  activo?: boolean;
+  pago_semanal?: number;
+  pago_diario?: number;
+  enganche?: number;
+  created_at?: string;
+};
+
+export type EjecutivoPublico = {
+  id: string;
+  email?: string | null;
+  nombre?: string | null;
+  telefono_whatsapp: string;
+  gerencia?: string | null;
+  ciudad?: string | null;
+  activo: boolean;
+  prioridad?: number | null;
+};
+
+export type SolicitudCompra = {
+  id?: string;
+  producto_id: string;
+  nombre_cliente: string;
+  telefono: string;
+  email?: string | null;
+  curp?: string | null;
+  ciudad?: string | null;
+  comentarios?: string | null;
+  fuente?: string;
+  estatus?: "nuevo" | "en_contacto" | "cerrado_venta" | "descartado";
+  ejecutivo_asignado?: string | null;
+  gerencia_asignada?: string | null;
+  user_agent?: string | null;
+  ip_address?: string | null;
+  fecha_creacion?: string;
+  fecha_contacto?: string | null;
+  fecha_cierre?: string | null;
+};
+
+export type PlazoOpcion = {
+  semanas: number;
+  pago_semanal: number;
+};
