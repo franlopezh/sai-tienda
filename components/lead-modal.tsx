@@ -23,6 +23,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { formatMXN, buildWhatsAppLink } from "@/lib/format";
 import type { Producto } from "@/lib/types";
+import type { PlanCredito } from "@/lib/credito";
 
 const CIUDADES = [
   "Tlaxcala",
@@ -43,6 +44,8 @@ type Props = {
   pagoSemanal: number;
   semanas: number;
   compact?: boolean;
+  planSeleccionado?: PlanCredito | null;
+  ctaLabel?: string;
 };
 
 export function LeadModal({
@@ -50,6 +53,8 @@ export function LeadModal({
   pagoSemanal,
   semanas,
   compact = false,
+  planSeleccionado = null,
+  ctaLabel,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [nombre, setNombre] = useState("");
@@ -136,11 +141,20 @@ export function LeadModal({
       }
 
       const folio = `SAI-${solicitudId.slice(0, 8).toUpperCase()}`;
+      const lineasPlan = planSeleccionado
+        ? [
+            `• Plan: ${planSeleccionado.plazoMeses} meses (${planSeleccionado.semanas} semanas)`,
+            `• Pago: ${formatMXN(planSeleccionado.pagoSemanal)} / semana · ${formatMXN(planSeleccionado.pagoDiario)} / día`,
+            `• Enganche: ${formatMXN(planSeleccionado.enganche)}`,
+            `• Total a pagar: ${formatMXN(planSeleccionado.total)}`,
+          ]
+        : [`• Pago: ${formatMXN(pagoSemanal)} a ${semanas} semanas`];
+
       const mensaje = [
         `Hola, soy ${nombre.trim()}.`,
         `Estoy interesado en financiar:`,
         `• Producto: ${producto.nombre}${producto.marca ? ` (${producto.marca})` : ""}`,
-        `• Pago: ${formatMXN(pagoSemanal)} a ${semanas} semanas`,
+        ...lineasPlan,
         `• Mi ciudad: ${ciudad}`,
         comentarios.trim() ? `• Comentarios: ${comentarios.trim()}` : null,
         `• Folio: ${folio}`,
@@ -173,7 +187,7 @@ export function LeadModal({
           />
         }
       >
-        {compact ? "💬 Financiar" : "💬 Quiero financiarlo"}
+        {ctaLabel ?? (compact ? "💬 Financiar" : "💬 Quiero financiarlo")}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -198,9 +212,16 @@ export function LeadModal({
                 </p>
               )}
               <DialogTitle className="truncate">{producto.nombre}</DialogTitle>
-              <p className="text-xs text-muted-foreground">
-                {formatMXN(pagoSemanal)} / semana · {semanas} semanas
-              </p>
+              {planSeleccionado ? (
+                <p className="text-xs text-muted-foreground">
+                  Plan {planSeleccionado.plazoMeses} meses ·{" "}
+                  {formatMXN(planSeleccionado.pagoSemanal)} / semana
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  {formatMXN(pagoSemanal)} / semana · {semanas} semanas
+                </p>
+              )}
             </div>
           </div>
           <p className="mt-3 text-xs text-muted-foreground">

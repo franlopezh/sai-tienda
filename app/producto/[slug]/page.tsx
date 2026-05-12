@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { LeadModal } from "@/components/lead-modal";
+import { SimuladorCredito } from "@/components/simulador-credito";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { formatMXN } from "@/lib/format";
@@ -11,6 +12,7 @@ import {
   getProductosRelacionados,
   getCategoriaById,
 } from "@/lib/queries";
+import { calcularPlan, PLAZO_DEFAULT } from "@/lib/credito";
 import { ProductCard } from "@/components/product-card";
 
 type Params = Promise<{ slug: string }>;
@@ -32,11 +34,15 @@ export default async function ProductoPage({ params }: { params: Params }) {
       ? [producto.imagen_url]
       : [];
 
-  const pagoSemanal = producto.pago_semanal ?? 0;
-  const semanasEstimadas =
-    pagoSemanal > 0 && producto.precio_credito > 0
-      ? Math.ceil(producto.precio_credito / pagoSemanal)
-      : 78;
+  // Plan default (12 meses) calculado al vuelo desde precio_contado.
+  // Se usa para el sticky CTA mobile y como fallback del lead-modal
+  // cuando el cliente no interactúa con el simulador.
+  const planDefault = calcularPlan(
+    producto.precio_contado ?? 0,
+    PLAZO_DEFAULT
+  );
+  const pagoSemanal = planDefault.pagoSemanal;
+  const semanasEstimadas = planDefault.semanas;
 
   return (
     <div className="flex flex-col flex-1">
@@ -101,39 +107,7 @@ export default async function ProductoPage({ params }: { params: Params }) {
 
               <Separator />
 
-              <div>
-                <p className="text-sm text-muted-foreground">Financia desde</p>
-                {producto.pago_diario && producto.pago_diario > 0 ? (
-                  <>
-                    <p className="text-3xl font-semibold">
-                      {formatMXN(producto.pago_diario)} / día
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      o {formatMXN(pagoSemanal)} / semana · {semanasEstimadas} semanas
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-3xl font-semibold">
-                      {formatMXN(pagoSemanal)} / semana
-                    </p>
-                    <p className="text-sm text-muted-foreground">a {semanasEstimadas} semanas</p>
-                  </>
-                )}
-                {producto.enganche && producto.enganche > 0 ? (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Enganche: {formatMXN(producto.enganche)}
-                  </p>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="mt-8 hidden md:block">
-              <LeadModal
-                producto={producto}
-                pagoSemanal={pagoSemanal}
-                semanas={semanasEstimadas}
-              />
+              <SimuladorCredito producto={producto} />
             </div>
 
             <ul className="mt-6 space-y-1 text-sm text-foreground/80">
