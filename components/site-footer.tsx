@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PulseLogo } from "@/components/pulse-logo";
+import { WhatsAppLink } from "@/components/whatsapp-link";
 
 const SUCURSALES = [
   "Tlaxcala",
@@ -84,14 +85,9 @@ export function SiteFooter() {
               </a>
             </li>
             <li>
-              <a
-                href="#"
-                className="hover:text-foreground"
-                target="_blank"
-                rel="noreferrer"
-              >
+              <WhatsAppLink className="hover:text-foreground">
                 WhatsApp general
-              </a>
+              </WhatsAppLink>
             </li>
           </ul>
         </div>

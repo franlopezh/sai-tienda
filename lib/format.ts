@@ -22,3 +22,15 @@ export function buildWhatsAppLink(
   const cleanTel = telefono.replace(/\D/g, "");
   return `https://wa.me/${cleanTel}?text=${encodeURIComponent(mensaje)}`;
 }
+
+// Números WhatsApp de atención general (no son los ejecutivos del lead-modal,
+// que vienen de la tabla `ejecutivos_publicos`). Usados por el FAB, footer y
+// página de contacto. Se rotan random por visita.
+export const WA_NUMEROS_GENERAL = [
+  "5215542527627",
+  "5215571640818",
+  "5215515971526",
+];
+
+export const WA_MENSAJE_GENERAL =
+  "Hola, me interesa información sobre SAI Préstamos.";

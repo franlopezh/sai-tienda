@@ -101,10 +101,14 @@ export function LeadModal({
       const ejecutivoCiudad =
         pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null;
 
-      // 2) INSERT solicitud incluyendo el ejecutivo asignado.
-      const { data: solicitud, error: insertError } = await supabase
+      // 2) INSERT solicitud. Generamos el UUID en el cliente para no depender
+      //    de RETURNING — anon no tiene SELECT policy en solicitudes_compra
+      //    (decisión de arquitectura: anon solo escribe leads, nunca los lee).
+      const solicitudId = crypto.randomUUID();
+      const { error: insertError } = await supabase
         .from("solicitudes_compra")
         .insert({
+          id: solicitudId,
           producto_id: producto.id,
           nombre_cliente: nombre.trim(),
           telefono: tel,
@@ -116,12 +120,10 @@ export function LeadModal({
           gerencia_asignada: ejecutivoCiudad?.gerencia ?? null,
           user_agent:
             typeof navigator !== "undefined" ? navigator.userAgent : null,
-        })
-        .select("id")
-        .single();
+        });
 
-      if (insertError || !solicitud) {
-        console.error(insertError);
+      if (insertError) {
+        console.error("[lead-modal] INSERT error:", insertError);
         setError(
           "No pudimos guardar tu solicitud. Intenta de nuevo en un momento."
         );
@@ -129,11 +131,11 @@ export function LeadModal({
       }
 
       if (!ejecutivoCiudad?.telefono_whatsapp) {
-        window.location.href = `/solicitud/${solicitud.id}`;
+        window.location.href = `/solicitud/${solicitudId}`;
         return;
       }
 
-      const folio = `SAI-${solicitud.id.slice(0, 8).toUpperCase()}`;
+      const folio = `SAI-${solicitudId.slice(0, 8).toUpperCase()}`;
       const mensaje = [
         `Hola, soy ${nombre.trim()}.`,
         `Estoy interesado en financiar:`,
@@ -151,7 +153,7 @@ export function LeadModal({
         mensaje
       );
 
-      window.location.href = `/solicitud/${solicitud.id}?wa=${encodeURIComponent(link)}`;
+      window.location.href = `/solicitud/${solicitudId}?wa=${encodeURIComponent(link)}`;
     });
   }
 

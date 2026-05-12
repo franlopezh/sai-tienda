@@ -1,3 +1,5 @@
+import { WhatsAppLink } from "@/components/whatsapp-link";
+
 export const metadata = {
   title: "Contacto — SAI Tienda",
 };
@@ -42,14 +44,18 @@ export default function ContactoPage() {
 
       <h2 className="mt-10 text-xl font-semibold">Otras vías</h2>
       <ul className="mt-3 list-disc pl-6 text-sm">
-        <li>WhatsApp general — pendiente de configurar</li>
+        <li>
+          <WhatsAppLink className="text-foreground underline-offset-4 hover:underline">
+            Escríbenos por WhatsApp
+          </WhatsAppLink>
+        </li>
         <li>Instagram — pendiente</li>
         <li>Facebook — pendiente</li>
       </ul>
 
       <p className="mt-12 text-sm text-muted-foreground italic">
-        SAI debe completar esta página con direcciones físicas, teléfonos y
-        URLs de redes sociales antes de publicar a producción.
+        SAI debe completar esta página con direcciones físicas y URLs de redes
+        sociales antes de publicar a producción.
       </p>
     </article>
   );
