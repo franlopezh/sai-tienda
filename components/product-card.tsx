@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatMXN } from "@/lib/format";
+import { calcularPlan, PLAZO_DEFAULT } from "@/lib/credito";
 import type { Producto } from "@/lib/types";
 
 const DIAS_NUEVO = 30;
@@ -24,6 +25,15 @@ function getBadge(p: Producto): { label: string; tone: string } | null {
 
 export function ProductCard({ producto }: { producto: Producto }) {
   const badge = getBadge(producto);
+
+  // Calcular pago al vuelo desde precio_contado (plan default 12 meses).
+  // Esto reemplaza la dependencia de pago_semanal/pago_diario/precio_credito
+  // de BD, que pueden estar desactualizados o NULL en productos nuevos.
+  const precio = producto.precio_contado ?? 0;
+  const plan = precio > 0 ? calcularPlan(precio, PLAZO_DEFAULT) : null;
+  const pagoSemanal = plan?.pagoSemanal ?? producto.pago_semanal ?? 0;
+  const pagoDiario = plan?.pagoDiario ?? producto.pago_diario ?? 0;
+  const totalFinanciado = plan?.total ?? producto.precio_credito ?? 0;
 
   return (
     <Link href={`/producto/${producto.slug}`} className="group block h-full">
@@ -57,35 +67,35 @@ export function ProductCard({ producto }: { producto: Producto }) {
           <h3 className="mt-1 line-clamp-2 text-sm font-medium">
             {producto.nombre}
           </h3>
-          {producto.pago_diario && producto.pago_diario > 0 ? (
+          {pagoDiario > 0 ? (
             <div className="mt-3">
               <p className="text-base font-semibold">
-                {formatMXN(producto.pago_diario)}
+                {formatMXN(pagoDiario)}
                 <span className="text-xs font-normal text-muted-foreground">
                   {" "}/ día
                 </span>
               </p>
-              {producto.pago_semanal && producto.pago_semanal > 0 ? (
+              {pagoSemanal > 0 ? (
                 <p className="text-xs text-muted-foreground">
-                  o {formatMXN(producto.pago_semanal)} / semana
+                  o {formatMXN(pagoSemanal)} / semana
                 </p>
               ) : null}
             </div>
-          ) : producto.pago_semanal && producto.pago_semanal > 0 ? (
+          ) : pagoSemanal > 0 ? (
             <p className="mt-3 text-base font-semibold">
-              {formatMXN(producto.pago_semanal)}
+              {formatMXN(pagoSemanal)}
               <span className="text-xs font-normal text-muted-foreground">
                 {" "}/ semana
               </span>
             </p>
-          ) : (
-            <p className="mt-3 text-base font-semibold">
-              {formatMXN(producto.precio_credito)}
+          ) : precio > 0 ? (
+            <p className="mt-3 text-base font-semibold">{formatMXN(precio)}</p>
+          ) : null}
+          {totalFinanciado > 0 ? (
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              o {formatMXN(totalFinanciado)} financiado
             </p>
-          )}
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            o {formatMXN(producto.precio_credito)} financiado
-          </p>
+          ) : null}
         </CardContent>
       </Card>
     </Link>
