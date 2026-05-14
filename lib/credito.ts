@@ -37,6 +37,17 @@ const CONFIG_PLAZOS: Record<
 export const PLAZOS_DISPONIBLES: PlazoCredito[] = [4, 9, 12, 18];
 export const PLAZO_DEFAULT: PlazoCredito = 12;
 
+// El plazo de 4 meses solo aplica a celulares por ahora. Las motos
+// se muestran únicamente con 9/12/18 meses.
+export function getPlazosPorCategoria(
+  categoriaSlug?: string | null
+): PlazoCredito[] {
+  if (categoriaSlug === "celulares") {
+    return [4, 9, 12, 18];
+  }
+  return [9, 12, 18];
+}
+
 const ENGANCHE_PCT = 0.1;
 const DIAS_POR_SEMANA = 6;
 

@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from "react";
 import {
-  calcularPlanes,
+  calcularPlan,
   PLAZO_DEFAULT,
+  getPlazosPorCategoria,
   type PlanCredito,
 } from "@/lib/credito";
 import { formatMXN } from "@/lib/format";
@@ -13,16 +14,29 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   producto: Producto;
+  categoriaSlug?: string | null;
 };
 
-export function SimuladorCredito({ producto }: Props) {
+export function SimuladorCredito({ producto, categoriaSlug }: Props) {
   const precio = producto.precio_contado ?? 0;
-  const planes = useMemo(() => calcularPlanes(precio), [precio]);
+  const plazos = useMemo(
+    () => getPlazosPorCategoria(categoriaSlug),
+    [categoriaSlug]
+  );
+  const planes = useMemo(
+    () => plazos.map((p) => calcularPlan(precio, p)),
+    [precio, plazos]
+  );
   const planDefault =
     planes.find((p) => p.plazo === PLAZO_DEFAULT) ?? planes[0];
   const [seleccionado, setSeleccionado] = useState<PlanCredito>(planDefault);
 
   if (!precio || precio <= 0) return null;
+
+  const gridCols =
+    planes.length === 4
+      ? "grid-cols-2 lg:grid-cols-4"
+      : "grid-cols-1 sm:grid-cols-3";
 
   return (
     <section className="mt-2">
@@ -35,7 +49,7 @@ export function SimuladorCredito({ producto }: Props) {
         </p>
       </header>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className={cn("grid gap-3", gridCols)}>
         {planes.map((plan) => {
           const activo = plan.plazo === seleccionado.plazo;
           return (

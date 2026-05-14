@@ -107,7 +107,10 @@ export default async function ProductoPage({ params }: { params: Params }) {
 
               <Separator />
 
-              <SimuladorCredito producto={producto} />
+              <SimuladorCredito
+                producto={producto}
+                categoriaSlug={categoria?.slug}
+              />
             </div>
 
             <ul className="mt-6 space-y-1 text-sm text-foreground/80">
