@@ -6,7 +6,7 @@
 //   pago_semanal     = total_a_financiar / semanas
 //   pago_diario      = pago_semanal / 6
 
-export type PlazoCredito = 9 | 12 | 18;
+export type PlazoCredito = 4 | 9 | 12 | 18;
 
 export type PlanCredito = {
   plazo: PlazoCredito;
@@ -25,12 +25,16 @@ const CONFIG_PLAZOS: Record<
   PlazoCredito,
   { multiplicador: number; semanas: number; interesPct: number }
 > = {
+  // Plazo corto pensado para celulares (109 días ≈ 18 semanas).
+  // Mismo multiplicador que 12 meses: el total a pagar es igual,
+  // solo cambia la duración (pagos más altos en menos tiempo).
+  4: { multiplicador: 1.7, semanas: 18, interesPct: 70 },
   9: { multiplicador: 1.525, semanas: 39, interesPct: 52.5 },
   12: { multiplicador: 1.7, semanas: 52, interesPct: 70 },
   18: { multiplicador: 2.05, semanas: 78, interesPct: 105 },
 };
 
-export const PLAZOS_DISPONIBLES: PlazoCredito[] = [9, 12, 18];
+export const PLAZOS_DISPONIBLES: PlazoCredito[] = [4, 9, 12, 18];
 export const PLAZO_DEFAULT: PlazoCredito = 12;
 
 const ENGANCHE_PCT = 0.1;
