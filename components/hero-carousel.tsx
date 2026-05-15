@@ -46,13 +46,13 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
 
   return (
     <section
-      className="group relative mx-auto max-w-6xl px-4 pt-12"
+      className="group relative w-full overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"
       aria-label="Productos destacados"
     >
-      <div className="relative overflow-hidden rounded-2xl shadow-xl">
+      <div className="relative">
         {slides.map((slide, idx) => {
           const isActive = idx === current;
           return (
@@ -72,12 +72,12 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
                   slide.bgGradient ?? "from-blue-900 via-blue-700 to-blue-500"
                 )}
               >
-                <div className="grid h-full gap-6 md:grid-cols-2 md:items-center">
-                  <div className="px-6 py-12 md:px-12 md:py-20">
+                <div className="mx-auto grid h-full max-w-6xl gap-6 px-6 sm:px-10 md:grid-cols-2 md:items-center md:px-12 lg:px-16">
+                  <div className="py-16 md:py-24">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-200">
                       {slide.eyebrow}
                     </p>
-                    <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl md:leading-tight">
+                    <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl md:leading-tight lg:text-6xl">
                       {slide.title}
                     </h2>
                     <p className="mt-4 max-w-md text-base text-blue-100 md:text-lg">
@@ -107,12 +107,12 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
                     </div>
                   </div>
                   {slide.image && (
-                    <div className="flex items-center justify-center px-6 pb-12 md:h-full md:px-12 md:pb-0">
+                    <div className="flex items-center justify-center pb-12 md:h-full md:pb-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={slide.image}
                         alt={slide.imageAlt ?? slide.title}
-                        className="max-h-72 w-auto object-contain drop-shadow-2xl md:max-h-96"
+                        className="max-h-72 w-auto object-contain drop-shadow-2xl md:max-h-[28rem] lg:max-h-[32rem]"
                       />
                     </div>
                   )}
@@ -124,29 +124,29 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
 
         {/* Spacer para forzar altura, el slide activo lo cubre con absolute */}
         <div className="invisible">
-          <div className="grid gap-6 md:grid-cols-2 md:items-center">
-            <div className="px-6 py-12 md:px-12 md:py-20">
+          <div className="mx-auto grid max-w-6xl gap-6 px-6 md:grid-cols-2 md:items-center md:px-12">
+            <div className="py-16 md:py-24">
               <p className="text-[11px]">eyebrow</p>
-              <h2 className="mt-3 text-3xl md:text-5xl md:leading-tight">
-                Placeholder de altura del hero
+              <h2 className="mt-3 text-3xl md:text-5xl md:leading-tight lg:text-6xl">
+                Placeholder altura
                 <br />
-                en dos líneas mínimo
+                dos líneas mínimo
               </h2>
               <p className="mt-4 text-base md:text-lg">subtitle</p>
               <div className="mt-7 h-12" />
             </div>
-            <div className="hidden md:block md:h-96" />
+            <div className="hidden md:block md:h-[28rem] lg:h-[32rem]" />
           </div>
         </div>
 
-        {/* Flechas */}
+        {/* Flechas — pegadas al borde de la pantalla, fuera del max-w del contenido */}
         {slides.length > 1 && (
           <>
             <button
               type="button"
               onClick={prev}
               aria-label="Anterior"
-              className="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white opacity-0 backdrop-blur transition hover:bg-white/25 group-hover:opacity-100 md:left-5 md:h-12 md:w-12"
+              className="absolute left-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white opacity-0 backdrop-blur transition hover:bg-white/25 group-hover:opacity-100 md:left-4 md:h-12 md:w-12"
             >
               <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
             </button>
@@ -154,7 +154,7 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
               type="button"
               onClick={next}
               aria-label="Siguiente"
-              className="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white opacity-0 backdrop-blur transition hover:bg-white/25 group-hover:opacity-100 md:right-5 md:h-12 md:w-12"
+              className="absolute right-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white opacity-0 backdrop-blur transition hover:bg-white/25 group-hover:opacity-100 md:right-4 md:h-12 md:w-12"
             >
               <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
             </button>
