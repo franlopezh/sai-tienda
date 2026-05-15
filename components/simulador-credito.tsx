@@ -2,9 +2,8 @@
 
 import { useMemo, useState } from "react";
 import {
-  calcularPlan,
-  PLAZO_DEFAULT,
-  getPlazosPorCategoria,
+  calcularPlanes,
+  getPlazoDefault,
   type PlanCredito,
 } from "@/lib/credito";
 import { formatMXN } from "@/lib/format";
@@ -14,24 +13,20 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   producto: Producto;
-  categoriaSlug?: string | null;
 };
 
-export function SimuladorCredito({ producto, categoriaSlug }: Props) {
+function formatPlazo(meses: number): string {
+  return Number.isInteger(meses) ? `${meses} meses` : `${meses} meses`;
+}
+
+export function SimuladorCredito({ producto }: Props) {
   const precio = producto.precio_contado ?? 0;
-  const plazos = useMemo(
-    () => getPlazosPorCategoria(categoriaSlug),
-    [categoriaSlug]
-  );
-  const planes = useMemo(
-    () => plazos.map((p) => calcularPlan(precio, p)),
-    [precio, plazos]
-  );
+  const planes = useMemo(() => calcularPlanes(precio), [precio]);
   const planDefault =
-    planes.find((p) => p.plazo === PLAZO_DEFAULT) ?? planes[0];
+    planes.find((p) => p.plazo === getPlazoDefault(precio)) ?? planes[0];
   const [seleccionado, setSeleccionado] = useState<PlanCredito>(planDefault);
 
-  if (!precio || precio <= 0) return null;
+  if (!precio || precio <= 0 || planes.length === 0) return null;
 
   const gridCols =
     planes.length === 4
@@ -68,7 +63,7 @@ export function SimuladorCredito({ producto, categoriaSlug }: Props) {
             >
               <div className="flex items-baseline justify-between">
                 <span className="text-sm font-semibold">
-                  {plan.plazoMeses} meses
+                  {formatPlazo(plan.plazoMeses)}
                 </span>
                 <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
                   {plan.semanas} sem
@@ -105,7 +100,7 @@ export function SimuladorCredito({ producto, categoriaSlug }: Props) {
         <p className="text-xs text-muted-foreground">
           Plan elegido:{" "}
           <span className="font-medium text-foreground">
-            {seleccionado.plazoMeses} meses
+            {formatPlazo(seleccionado.plazoMeses)}
           </span>
           {" · "}
           <span className="font-medium text-foreground">

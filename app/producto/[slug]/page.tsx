@@ -12,7 +12,7 @@ import {
   getProductosRelacionados,
   getCategoriaById,
 } from "@/lib/queries";
-import { calcularPlan, PLAZO_DEFAULT } from "@/lib/credito";
+import { calcularPlanDefault } from "@/lib/credito";
 import { ProductCard } from "@/components/product-card";
 
 type Params = Promise<{ slug: string }>;
@@ -34,15 +34,12 @@ export default async function ProductoPage({ params }: { params: Params }) {
       ? [producto.imagen_url]
       : [];
 
-  // Plan default (12 meses) calculado al vuelo desde precio_contado.
-  // Se usa para el sticky CTA mobile y como fallback del lead-modal
-  // cuando el cliente no interactúa con el simulador.
-  const planDefault = calcularPlan(
-    producto.precio_contado ?? 0,
-    PLAZO_DEFAULT
-  );
-  const pagoSemanal = planDefault.pagoSemanal;
-  const semanasEstimadas = planDefault.semanas;
+  // Plan default según segmento del producto (pequenos/medianos/grandes)
+  // calculado al vuelo desde precio_contado. Se usa para el sticky CTA mobile
+  // y como fallback del lead-modal cuando el cliente no interactúa con el simulador.
+  const planDefault = calcularPlanDefault(producto.precio_contado ?? 0);
+  const pagoSemanal = planDefault?.pagoSemanal ?? 0;
+  const semanasEstimadas = planDefault?.semanas ?? 52;
 
   return (
     <div className="flex flex-col flex-1">
@@ -107,10 +104,7 @@ export default async function ProductoPage({ params }: { params: Params }) {
 
               <Separator />
 
-              <SimuladorCredito
-                producto={producto}
-                categoriaSlug={categoria?.slug}
-              />
+              <SimuladorCredito producto={producto} />
             </div>
 
             <ul className="mt-6 space-y-1 text-sm text-foreground/80">

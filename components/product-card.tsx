@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatMXN } from "@/lib/format";
-import { calcularPlan, PLAZO_DEFAULT } from "@/lib/credito";
+import { calcularPlanDefault } from "@/lib/credito";
 import type { Producto } from "@/lib/types";
 
 const DIAS_NUEVO = 30;
@@ -26,11 +26,12 @@ function getBadge(p: Producto): { label: string; tone: string } | null {
 export function ProductCard({ producto }: { producto: Producto }) {
   const badge = getBadge(producto);
 
-  // Calcular pago al vuelo desde precio_contado (plan default 12 meses).
+  // Calcular pago al vuelo desde precio_contado con el plan default
+  // del segmento del producto (pequenos/medianos/grandes).
   // Esto reemplaza la dependencia de pago_semanal/pago_diario/precio_credito
   // de BD, que pueden estar desactualizados o NULL en productos nuevos.
   const precio = producto.precio_contado ?? 0;
-  const plan = precio > 0 ? calcularPlan(precio, PLAZO_DEFAULT) : null;
+  const plan = precio > 0 ? calcularPlanDefault(precio) : null;
   const pagoSemanal = plan?.pagoSemanal ?? producto.pago_semanal ?? 0;
   const pagoDiario = plan?.pagoDiario ?? producto.pago_diario ?? 0;
   const totalFinanciado = plan?.total ?? producto.precio_credito ?? 0;
