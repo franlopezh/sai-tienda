@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { Testimonios } from "@/components/testimonios";
+import { HeroCarousel, type HeroSlide } from "@/components/hero-carousel";
 import { getCategoriasConPreview, getProductosDestacados } from "@/lib/queries";
+import { calcularPlanDefault } from "@/lib/credito";
 import { formatMXN } from "@/lib/format";
 import {
   ShieldCheck,
@@ -35,79 +36,61 @@ export default async function Home() {
     getProductosDestacados(8),
   ]);
 
-  const heroProducto = destacados.find((p) => p.imagen_url) ?? destacados[0];
-  const restoDestacados = heroProducto
-    ? destacados.filter((p) => p.id !== heroProducto.id).slice(0, 4)
-    : destacados.slice(0, 4);
+  // Toma los primeros 4 destacados con imagen para los slides del hero.
+  const destacadosConImagen = destacados.filter((p) => p.imagen_url).slice(0, 4);
+
+  // Curated: si hay destacados, arma slides. Si no, deja al menos el slide genérico SAI.
+  const slidesProductos: HeroSlide[] = destacadosConImagen.map((p, idx) => {
+    const plan = calcularPlanDefault(p.precio_contado ?? 0);
+    const desde = plan?.pagoDiario ?? p.pago_diario ?? 0;
+    const gradients = [
+      "from-blue-900 via-blue-700 to-blue-500",
+      "from-slate-900 via-slate-800 to-blue-700",
+      "from-blue-800 via-indigo-700 to-blue-500",
+      "from-blue-950 via-blue-800 to-blue-600",
+    ];
+    return {
+      eyebrow: p.marca?.toUpperCase() ?? "DESTACADO",
+      title: p.nombre,
+      subtitle:
+        desde > 0
+          ? `Desde ${formatMXN(desde)} al día. Aprobación en 24h, sin checador.`
+          : "Aprobación en 24h, sin checador. Entrega a domicilio.",
+      ctaPrimary: { label: "Quiero financiarlo", href: `/producto/${p.slug}` },
+      ctaSecondary: { label: "Más información", href: `/producto/${p.slug}` },
+      image: p.imagen_url ?? undefined,
+      imageAlt: p.nombre,
+      bgGradient: gradients[idx % gradients.length],
+    };
+  });
+
+  // Slide de marca SAI siempre visible (incluso sin destacados).
+  const slideSAI: HeroSlide = {
+    eyebrow: "FINANCIAMIENTO SAI",
+    title: "Llévate hoy lo que necesitas, paga en semanas.",
+    subtitle:
+      "Sin checador. Aprobación en 24 horas. Entrega a domicilio en toda la región.",
+    ctaPrimary: {
+      label: "Ver catálogo",
+      href: categorias[0] ? `/categoria/${categorias[0].slug}` : "/productos",
+    },
+    ctaSecondary: { label: "Preguntas frecuentes", href: "/faq" },
+    bgGradient: "from-blue-900 via-blue-700 to-blue-500",
+  };
+
+  const heroSlides: HeroSlide[] =
+    slidesProductos.length > 0 ? slidesProductos : [slideSAI];
+
+  const restoDestacados = destacados
+    .filter((p) => !destacadosConImagen.some((d) => d.id === p.id))
+    .slice(0, 4);
 
   return (
     <div className="flex flex-col flex-1">
       <SiteHeader />
 
       <main className="flex-1">
-        <section className="mx-auto max-w-6xl px-4 py-12">
-          <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-800 via-blue-700 to-blue-500 text-white">
-            <div className="grid gap-6 md:grid-cols-2 md:items-center">
-              <div className="px-8 py-12 md:py-16">
-                <p className="text-xs uppercase tracking-widest text-blue-200">
-                  Financiamiento SAI
-                </p>
-                <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">
-                  Llévate hoy lo que necesitas, paga en semanas.
-                </h1>
-                <p className="mt-4 max-w-md text-blue-100">
-                  Sin checador. Aprobación en 24 horas. Entrega a domicilio.
-                </p>
-                {heroProducto ? (
-                  <div className="mt-8 rounded-xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur">
-                    <p className="text-xs uppercase tracking-wide text-blue-200">
-                      Destacado
-                    </p>
-                    <p className="mt-1 text-lg font-medium">
-                      {heroProducto.nombre}
-                    </p>
-                    {heroProducto.pago_semanal ? (
-                      <p className="mt-1 text-sm text-blue-100">
-                        Desde {formatMXN(heroProducto.pago_semanal)} / semana
-                      </p>
-                    ) : null}
-                    <Link
-                      href={`/producto/${heroProducto.slug}`}
-                      className={buttonVariants({
-                        size: "lg",
-                        className: "mt-4",
-                      })}
-                    >
-                      Ver detalle →
-                    </Link>
-                  </div>
-                ) : (
-                  categorias[0] && (
-                    <Link
-                      href={`/categoria/${categorias[0].slug}`}
-                      className={buttonVariants({
-                        size: "lg",
-                        className: "mt-8",
-                      })}
-                    >
-                      Ver catálogo →
-                    </Link>
-                  )
-                )}
-              </div>
-              {heroProducto?.imagen_url && (
-                <div className="flex aspect-square items-center justify-center bg-white/5 p-8 md:aspect-auto md:h-full">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={heroProducto.imagen_url}
-                    alt={heroProducto.nombre}
-                    className="max-h-80 w-auto object-contain"
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
+        <HeroCarousel slides={heroSlides} />
 
         <section className="mx-auto max-w-6xl px-4 py-10">
           <div className="grid gap-4 md:grid-cols-4">
