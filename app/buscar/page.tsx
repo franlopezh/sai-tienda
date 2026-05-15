@@ -7,7 +7,7 @@ import { buscarProductos } from "@/lib/queries";
 type Search = Promise<{ q?: string }>;
 
 export const metadata = {
-  title: "Buscar — SAI Tienda",
+  title: "Buscar — SAI Shop",
 };
 
 export default async function BuscarPage({

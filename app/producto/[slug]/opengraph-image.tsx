@@ -3,7 +3,7 @@ import { getProductoBySlug } from "@/lib/queries";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "SAI Tienda";
+export const alt = "SAI Shop";
 
 export default async function OpenGraphImage({
   params,
@@ -12,7 +12,7 @@ export default async function OpenGraphImage({
 }) {
   const producto = await getProductoBySlug(params.slug);
 
-  const nombre = producto?.nombre ?? "SAI Tienda";
+  const nombre = producto?.nombre ?? "SAI Shop";
   const marca = producto?.marca?.trim() ?? "";
   const pagoSemanal = producto?.pago_semanal ?? 0;
   const pagoDiario = producto?.pago_diario ?? 0;
@@ -60,7 +60,7 @@ export default async function OpenGraphImage({
             >
               <path d="M0 12 H18 L22 12 L26 4 L30 20 L34 8 L38 14 L42 12 H80" />
             </svg>
-            <span style={{ fontSize: 28, fontWeight: 600 }}>SAI Tienda</span>
+            <span style={{ fontSize: 28, fontWeight: 600 }}>SAI Shop</span>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column" }}>

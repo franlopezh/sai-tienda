@@ -7,7 +7,7 @@ export function PulseLogo({ className, showText = true }: Props) {
   return (
     <span
       className={`relative inline-flex items-center justify-center overflow-hidden rounded-md bg-blue-700 px-4 py-1.5 ${className ?? ""}`}
-      aria-label="SAI Tienda"
+      aria-label="SAI Shop"
     >
       <svg
         viewBox="0 0 160 36"
@@ -27,7 +27,7 @@ export function PulseLogo({ className, showText = true }: Props) {
           className="relative text-xl tracking-wide whitespace-nowrap text-white"
           style={{ fontFamily: "var(--font-logo)" }}
         >
-          SAI Tienda
+          SAI Shop
         </span>
       )}
     </span>

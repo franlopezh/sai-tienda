@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Aviso de privacidad — SAI Tienda",
+  title: "Aviso de privacidad — SAI Shop",
 };
 
 export default function PrivacidadPage() {

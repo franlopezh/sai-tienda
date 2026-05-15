@@ -26,7 +26,7 @@ const ORDENES_VALIDOS: OrdenProductos[] = [
 ];
 
 export const metadata = {
-  title: "Todos los productos — SAI Tienda",
+  title: "Todos los productos — SAI Shop",
 };
 
 export default async function TodosProductosPage({

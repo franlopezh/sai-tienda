@@ -25,7 +25,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SAI Tienda — Llévate hoy lo que necesitas, paga en semanas",
+  title: "SAI Shop — Llévate hoy lo que necesitas, paga en semanas",
   description:
     "Catálogo de motos, celulares y línea blanca con financiamiento SAI. Sin checador, aprobación en 24 horas.",
 };

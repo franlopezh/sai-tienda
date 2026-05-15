@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Preguntas frecuentes — SAI Tienda",
+  title: "Preguntas frecuentes — SAI Shop",
 };
 
 const FAQS = [

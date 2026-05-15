@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Términos y condiciones — SAI Tienda",
+  title: "Términos y condiciones — SAI Shop",
 };
 
 export default function TerminosPage() {
