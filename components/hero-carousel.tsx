@@ -52,6 +52,9 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
       aria-roledescription="carousel"
       aria-label="Productos destacados"
     >
+      {/* Fade inferior: difumina hacia la sección de ventajas que se superpone */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-32 bg-gradient-to-t from-background via-background/40 to-transparent" />
+
       <div className="relative">
         {slides.map((slide, idx) => {
           const isActive = idx === current;
@@ -72,18 +75,20 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
                   slide.bgGradient ?? "from-blue-900 via-blue-700 to-blue-500"
                 )}
               >
-                <div className="mx-auto grid h-full max-w-6xl gap-6 px-6 sm:px-10 md:grid-cols-2 md:items-center md:px-12 lg:px-16">
-                  <div className="py-16 md:py-24">
+                <div className="mx-auto grid h-full max-w-6xl gap-2 px-6 sm:px-10 md:grid-cols-2 md:items-center md:gap-6 md:px-12 lg:px-16">
+                  {/* En mobile: imagen va primero (arriba), texto después.
+                      En md+: texto a la izq, imagen a la der (orden natural). */}
+                  <div className="order-2 pb-56 text-center md:order-1 md:pt-32 md:pb-64 md:text-left">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-200">
                       {slide.eyebrow}
                     </p>
-                    <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl md:leading-tight lg:text-6xl">
+                    <h2 className="mt-2 text-2xl font-semibold tracking-tight md:mt-3 md:text-5xl md:leading-tight lg:text-6xl">
                       {slide.title}
                     </h2>
-                    <p className="mt-4 max-w-md text-base text-blue-100 md:text-lg">
+                    <p className="mx-auto mt-3 max-w-md text-sm text-blue-100 md:mx-0 md:mt-4 md:text-lg">
                       {slide.subtitle}
                     </p>
-                    <div className="mt-7 flex flex-wrap items-center gap-3">
+                    <div className="mt-5 flex flex-wrap items-center justify-center gap-3 md:mt-7 md:justify-start">
                       <Link
                         href={slide.ctaPrimary.href}
                         className={cn(
@@ -107,12 +112,12 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
                     </div>
                   </div>
                   {slide.image && (
-                    <div className="flex items-center justify-center pb-12 md:h-full md:pb-0">
+                    <div className="order-1 flex items-center justify-center pt-28 md:order-2 md:h-full md:pb-48 md:pt-32">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={slide.image}
                         alt={slide.imageAlt ?? slide.title}
-                        className="max-h-72 w-auto object-contain drop-shadow-2xl md:max-h-[28rem] lg:max-h-[32rem]"
+                        className="max-h-60 w-auto object-contain drop-shadow-2xl md:max-h-[28rem] lg:max-h-[32rem]"
                       />
                     </div>
                   )}
@@ -124,18 +129,20 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
 
         {/* Spacer para forzar altura, el slide activo lo cubre con absolute */}
         <div className="invisible">
-          <div className="mx-auto grid max-w-6xl gap-6 px-6 md:grid-cols-2 md:items-center md:px-12">
-            <div className="py-16 md:py-24">
+          <div className="mx-auto grid max-w-6xl gap-2 px-6 md:grid-cols-2 md:items-center md:gap-6 md:px-12">
+            {/* Texto (orden invertido en mobile como el slide real) */}
+            <div className="order-2 pb-56 md:order-1 md:pt-32 md:pb-64">
               <p className="text-[11px]">eyebrow</p>
-              <h2 className="mt-3 text-3xl md:text-5xl md:leading-tight lg:text-6xl">
+              <h2 className="mt-2 text-2xl md:mt-3 md:text-5xl md:leading-tight lg:text-6xl">
                 Placeholder altura
                 <br />
                 dos líneas mínimo
               </h2>
-              <p className="mt-4 text-base md:text-lg">subtitle</p>
-              <div className="mt-7 h-12" />
+              <p className="mt-3 text-sm md:mt-4 md:text-lg">subtitle</p>
+              <div className="mt-5 h-12 md:mt-7" />
             </div>
-            <div className="hidden md:block md:h-[28rem] lg:h-[32rem]" />
+            {/* Imagen (placeholder de altura) */}
+            <div className="order-1 h-60 pt-28 md:order-2 md:h-[28rem] md:pt-32 lg:h-[32rem]" />
           </div>
         </div>
 
@@ -166,7 +173,7 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
           <div
             role="tablist"
             aria-label="Slides"
-            className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 md:bottom-6"
+            className="absolute bottom-32 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 md:bottom-40"
           >
             {slides.map((_, idx) => (
               <button

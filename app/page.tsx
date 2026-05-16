@@ -43,11 +43,13 @@ export default async function Home() {
   const slidesProductos: HeroSlide[] = destacadosConImagen.map((p, idx) => {
     const plan = calcularPlanDefault(p.precio_contado ?? 0);
     const desde = plan?.pagoDiario ?? p.pago_diario ?? 0;
+    // Gradientes más oscuros para integrar mejor con bg-background (dark)
+    // y que el fade arriba/abajo del carrusel se vea natural.
     const gradients = [
-      "from-blue-900 via-blue-700 to-blue-500",
-      "from-slate-900 via-slate-800 to-blue-700",
-      "from-blue-800 via-indigo-700 to-blue-500",
-      "from-blue-950 via-blue-800 to-blue-600",
+      "from-blue-950 via-blue-800 to-blue-900",
+      "from-slate-950 via-slate-900 to-blue-900",
+      "from-blue-900 via-indigo-900 to-blue-950",
+      "from-blue-950 via-blue-900 to-slate-900",
     ];
     return {
       eyebrow: p.marca?.toUpperCase() ?? "DESTACADO",
@@ -75,7 +77,7 @@ export default async function Home() {
       href: categorias[0] ? `/categoria/${categorias[0].slug}` : "/productos",
     },
     ctaSecondary: { label: "Preguntas frecuentes", href: "/faq" },
-    bgGradient: "from-blue-900 via-blue-700 to-blue-500",
+    bgGradient: "from-blue-950 via-blue-800 to-blue-900",
   };
 
   const heroSlides: HeroSlide[] =
@@ -87,13 +89,13 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col flex-1">
-      <SiteHeader />
+      <SiteHeader overlay />
 
       <main className="flex-1">
         <HeroCarousel slides={heroSlides} />
 
-        <section className="mx-auto max-w-6xl px-4 py-10">
-          <div className="grid gap-4 md:grid-cols-4">
+        <section className="relative z-20 mx-auto -mt-16 max-w-6xl px-4 md:-mt-20 md:px-6">
+          <div className="grid gap-4 rounded-2xl border bg-card/95 p-4 shadow-xl backdrop-blur-md md:grid-cols-4 md:p-6">
             {[
               {
                 Icon: ShieldCheck,
@@ -116,15 +118,14 @@ export default async function Home() {
                 texto: "Tú eliges la frecuencia.",
               },
             ].map(({ Icon, titulo, texto }) => (
-              <div
-                key={titulo}
-                className="flex items-start gap-3 rounded-lg border bg-card p-4"
-              >
-                <span className="rounded-full bg-blue-50 p-2 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+              <div key={titulo} className="flex items-start gap-3">
+                <span className="shrink-0 rounded-full bg-blue-50 p-2.5 text-blue-700 dark:bg-blue-950/70 dark:text-blue-300">
                   <Icon className="h-5 w-5" />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-foreground">{titulo}</p>
+                  <p className="text-sm font-semibold text-foreground">
+                    {titulo}
+                  </p>
                   <p className="text-xs text-muted-foreground">{texto}</p>
                 </div>
               </div>
@@ -143,12 +144,23 @@ export default async function Home() {
                       const preview =
                         c.preview_imagen ?? PREVIEW_FALLBACK[c.slug ?? ""];
                       return preview ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={preview}
-                          alt={c.nombre}
-                          className="max-h-full max-w-full object-contain"
-                        />
+                        <>
+                          {/* Ambient: campo de color extendido desde los
+                              bordes de la imagen preview de la categoría. */}
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={preview}
+                            alt=""
+                            aria-hidden
+                            className="absolute inset-0 h-full w-full scale-[3] object-cover blur-[120px]"
+                          />
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={preview}
+                            alt={c.nombre}
+                            className="relative z-10 max-h-full max-w-full object-contain"
+                          />
+                        </>
                       ) : (
                         <span className="text-5xl">
                           {ICONO_FALLBACK[c.slug ?? ""] ?? "🛒"}

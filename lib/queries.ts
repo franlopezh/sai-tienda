@@ -26,12 +26,15 @@ export async function getCategoriasConPreview(): Promise<CategoriaConPreview[]> 
 
   const enriched = await Promise.all(
     categorias.map(async (c) => {
+      // Contamos todos los productos (activos + agotados), porque los
+      // agotados también se muestran en el listado con su badge.
       const { count } = await supabase
         .from("productos")
         .select("id", { count: "exact", head: true })
-        .eq("categoria_id", c.id)
-        .eq("activo", true);
+        .eq("categoria_id", c.id);
 
+      // Para el preview de la categoría sí preferimos un producto activo
+      // y con imagen.
       const { data: preview } = await supabase
         .from("productos")
         .select("imagen_url")
@@ -111,10 +114,12 @@ export async function getProductosPorCategoria(
     .select(
       "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
     )
-    .eq("categoria_id", categoriaId)
-    .eq("activo", true);
+    .eq("categoria_id", categoriaId);
 
   if (filtros.marca) query = query.eq("marca", filtros.marca);
+
+  // Siempre activos primero, agotados al final (independiente del orden secundario).
+  query = query.order("activo", { ascending: false });
 
   switch (filtros.orden) {
     case "credito_asc":
@@ -163,11 +168,13 @@ export async function getTodosLosProductos(
     .from("productos")
     .select(
       "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
-    )
-    .eq("activo", true);
+    );
 
   if (filtros.categoriaId) query = query.eq("categoria_id", filtros.categoriaId);
   if (filtros.marca) query = query.eq("marca", filtros.marca);
+
+  // Activos primero, agotados al final.
+  query = query.order("activo", { ascending: false });
 
   switch (filtros.orden) {
     case "credito_asc":
@@ -263,10 +270,10 @@ export async function buscarProductos(termino: string): Promise<Producto[]> {
     .select(
       "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
     )
-    .eq("activo", true)
     .or(
       `nombre.ilike.${ilike},marca.ilike.${ilike},modelo.ilike.${ilike}`
     )
+    .order("activo", { ascending: false })
     .order("nombre", { ascending: true })
     .limit(60);
 
@@ -280,13 +287,16 @@ export async function buscarProductos(termino: string): Promise<Producto[]> {
 export async function getProductoBySlug(
   slug: string
 ): Promise<Producto | null> {
+  // No filtramos por activo: las fichas de productos agotados siguen
+  // siendo accesibles para que el cliente que haga click en una card
+  // con badge "Agotado" pueda ver detalle. El componente de detalle se
+  // encarga de deshabilitar el lead-modal/simulador cuando activo=false.
   const { data, error } = await supabase
     .from("productos")
     .select(
       "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
     )
     .eq("slug", slug)
-    .eq("activo", true)
     .maybeSingle();
 
   if (error) {
