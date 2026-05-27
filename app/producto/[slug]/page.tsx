@@ -4,8 +4,11 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { LeadModal } from "@/components/lead-modal";
 import { SimuladorCredito } from "@/components/simulador-credito";
+import { ProductGallery } from "@/components/product-gallery";
+import { ShareButton } from "@/components/share-button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { ShieldCheck, Clock4, Truck, ChevronRight, Wrench } from "lucide-react";
 import { formatMXN } from "@/lib/format";
 import {
   getProductoBySlug,
@@ -16,6 +19,32 @@ import { calcularPlanDefault } from "@/lib/credito";
 import { ProductCard } from "@/components/product-card";
 
 type Params = Promise<{ slug: string }>;
+
+/**
+ * Parsea la descripción para extraer specs (líneas tipo "Cilindrada: 200cc").
+ * Devuelve { specs: [{key, value}], texto: "resto sin specs" }.
+ * Si no hay specs, devuelve el texto completo.
+ */
+function parseDescripcion(desc: string): {
+  specs: { key: string; value: string }[];
+  texto: string;
+} {
+  const lineas = desc.split(/\r?\n/).filter((l) => l.trim().length > 0);
+  const specs: { key: string; value: string }[] = [];
+  const otrasLineas: string[] = [];
+
+  for (const linea of lineas) {
+    // Patrón: "Clave: valor" donde la clave es relativamente corta (max 40 chars)
+    const m = linea.match(/^([A-Za-zÁ-ÿ0-9\s/().-]{2,40}):\s*(.+)$/);
+    if (m && m[2].trim().length > 0 && m[2].trim().length < 100) {
+      specs.push({ key: m[1].trim(), value: m[2].trim() });
+    } else {
+      otrasLineas.push(linea);
+    }
+  }
+
+  return { specs, texto: otrasLineas.join("\n") };
+}
 
 export default async function ProductoPage({ params }: { params: Params }) {
   const { slug } = await params;
@@ -34,88 +63,106 @@ export default async function ProductoPage({ params }: { params: Params }) {
       ? [producto.imagen_url]
       : [];
 
-  // Plan default según segmento del producto (pequenos/medianos/grandes)
-  // calculado al vuelo desde precio_contado. Se usa para el sticky CTA mobile
-  // y como fallback del lead-modal cuando el cliente no interactúa con el simulador.
   const planDefault = calcularPlanDefault(producto.precio_contado ?? 0);
   const pagoSemanal = planDefault?.pagoSemanal ?? 0;
+  const pagoDiario = planDefault?.pagoDiario ?? 0;
   const semanasEstimadas = planDefault?.semanas ?? 52;
+  const plazoMeses = planDefault?.plazoMeses ?? null;
   const agotado = producto.activo === false;
+
+  const descripcionParsed = producto.descripcion
+    ? parseDescripcion(producto.descripcion)
+    : null;
 
   return (
     <div className="flex flex-col flex-1">
       <SiteHeader />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-12">
-        <nav className="text-sm text-muted-foreground">
-          <Link href="/">Inicio</Link> › <span>{producto.nombre}</span>
+        {/* Breadcrumb con categoría */}
+        <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Link href="/" className="hover:text-foreground transition-colors">
+            Inicio
+          </Link>
+          <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+          {categoria && (
+            <>
+              <Link
+                href={`/categoria/${categoria.slug}`}
+                className="hover:text-foreground transition-colors"
+              >
+                {categoria.nombre}
+              </Link>
+              <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+            </>
+          )}
+          <span className="truncate text-foreground/80">{producto.nombre}</span>
         </nav>
 
         <div className="mt-6 grid gap-8 md:grid-cols-2 md:items-start">
+          {/* Galería interactiva + especificaciones debajo */}
           <div className="mx-auto w-full max-w-md md:mx-0">
-            <div className="relative h-80 w-full overflow-hidden rounded-lg border bg-card flex items-center justify-center text-muted-foreground/70 p-6 md:h-[420px]">
-              {galeria[0] ? (
-                <>
-                  {/* Ambient: campo de color extendido desde los bordes de
-                      la imagen. Scale alto + blur extremo = casi no se ve la
-                      imagen, solo el color predominante. */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={galeria[0]}
-                    alt=""
-                    aria-hidden
-                    className="absolute inset-0 h-full w-full scale-[3] object-cover blur-[120px]"
-                  />
-                  {/* Imagen real */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={galeria[0]}
-                    alt={producto.nombre}
-                    className="relative z-10 max-h-full max-w-full object-contain"
-                  />
-                </>
-              ) : (
-                <span className="text-7xl">📦</span>
-              )}
-            </div>
-            {galeria.length > 1 && (
-              <div className="mt-3 grid grid-cols-4 gap-2">
-                {galeria.slice(0, 4).map((url, idx) => (
-                  <div
-                    key={url + idx}
-                    className="relative aspect-square w-full overflow-hidden rounded-md border bg-card flex items-center justify-center p-2"
-                  >
-                    {/* Ambient: campo de color del thumbnail */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={url}
-                      alt=""
-                      aria-hidden
-                      className="absolute inset-0 h-full w-full scale-[3] object-cover blur-[80px]"
-                    />
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={url}
-                      alt={`${producto.nombre} ${idx + 1}`}
-                      className="relative z-10 max-h-full max-w-full object-contain"
-                    />
-                  </div>
-                ))}
-              </div>
+            <ProductGallery imagenes={galeria} nombre={producto.nombre} />
+
+            {/* Especificaciones técnicas — compactas, justo bajo la imagen.
+                Animación con delay para que aparezca después de la galería
+                y llame la atención sin opacar al producto. */}
+            {descripcionParsed && descripcionParsed.specs.length > 0 && (
+              <section
+                className="mt-5 animate-in fade-in-0 slide-in-from-bottom-4 fill-mode-both"
+                style={{ animationDuration: "700ms", animationDelay: "400ms" }}
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                    <Wrench className="h-3.5 w-3.5" />
+                  </span>
+                  <h2 className="text-sm font-semibold tracking-tight text-foreground">
+                    Especificaciones técnicas
+                  </h2>
+                </div>
+                <div className="overflow-hidden rounded-lg border border-blue-200/60 bg-gradient-to-br from-blue-50/60 to-transparent shadow-sm dark:border-blue-900/40 dark:from-blue-950/30 dark:to-transparent">
+                  <dl className="divide-y divide-blue-200/40 dark:divide-blue-900/30">
+                    {descripcionParsed.specs.map((s, idx) => (
+                      <div
+                        key={s.key + idx}
+                        className={`grid grid-cols-[45%_55%] transition-colors ${
+                          idx % 2 === 0
+                            ? "bg-blue-50/40 dark:bg-blue-950/30"
+                            : "bg-transparent"
+                        }`}
+                      >
+                        <dt className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-blue-700/80 dark:text-blue-300/80">
+                          {s.key}
+                        </dt>
+                        <dd className="px-3 py-2 text-xs font-medium text-foreground">
+                          {s.value}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              </section>
             )}
           </div>
 
+          {/* Info del producto */}
           <div>
-            <div className="flex items-center gap-2">
-              {producto.marca && (
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {producto.marca}
-                </p>
-              )}
-              {agotado && (
-                <span className="rounded-full bg-zinc-700 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                  Agotado
-                </span>
-              )}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                {producto.marca && (
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    {producto.marca}
+                  </p>
+                )}
+                {agotado && (
+                  <span className="rounded-full bg-zinc-700 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                    Agotado
+                  </span>
+                )}
+              </div>
+              <ShareButton
+                nombre={producto.nombre}
+                path={`/producto/${producto.slug}`}
+              />
             </div>
             <h1 className="mt-1 text-3xl font-semibold tracking-tight">
               {producto.nombre}
@@ -124,7 +171,9 @@ export default async function ProductoPage({ params }: { params: Params }) {
             <div className="mt-6 space-y-3">
               {producto.precio_contado > 0 && (
                 <div>
-                  <p className="text-sm text-muted-foreground">Precio de contado</p>
+                  <p className="text-sm text-muted-foreground">
+                    Precio de contado
+                  </p>
                   <p className="text-2xl font-semibold">
                     {formatMXN(producto.precio_contado)}
                   </p>
@@ -149,11 +198,25 @@ export default async function ProductoPage({ params }: { params: Params }) {
             </div>
 
             {!agotado && (
-              <ul className="mt-6 space-y-1 text-sm text-foreground/80">
-                <li>✓ Sin checador</li>
-                <li>✓ Aprobación en 24h</li>
-                <li>✓ Entrega a domicilio</li>
-              </ul>
+              <div className="mt-6 grid grid-cols-3 gap-3">
+                {[
+                  { Icon: ShieldCheck, label: "Sin checador" },
+                  { Icon: Clock4, label: "Aprobación 24h" },
+                  { Icon: Truck, label: "Entrega a domicilio" },
+                ].map(({ Icon, label }) => (
+                  <div
+                    key={label}
+                    className="flex flex-col items-start gap-2 rounded-lg border border-border/40 bg-card/40 p-3"
+                  >
+                    <span className="rounded-full bg-blue-50 p-1.5 text-blue-700 dark:bg-blue-950/70 dark:text-blue-300">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span className="text-[11px] font-medium leading-tight text-foreground">
+                      {label}
+                    </span>
+                  </div>
+                ))}
+              </div>
             )}
 
             {producto.modelo && (
@@ -164,11 +227,12 @@ export default async function ProductoPage({ params }: { params: Params }) {
           </div>
         </div>
 
-        {producto.descripcion && (
+        {/* Descripción libre (lo que no es spec) */}
+        {descripcionParsed && descripcionParsed.texto.trim().length > 0 && (
           <section className="mt-16">
             <h2 className="text-xl font-semibold">Descripción</h2>
             <p className="mt-3 max-w-prose whitespace-pre-line text-sm text-foreground/80">
-              {producto.descripcion}
+              {descripcionParsed.texto}
             </p>
           </section>
         )}
@@ -198,23 +262,32 @@ export default async function ProductoPage({ params }: { params: Params }) {
         )}
       </main>
 
-      {/* Sticky CTA solo en mobile (oculto si el producto está agotado) */}
+      {/* Sticky CTA mobile rediseñado — más jerarquía: plazo + pago + CTA */}
       <div
         className={
           agotado
             ? "hidden"
-            : "sticky bottom-0 z-20 border-t bg-card/95 backdrop-blur md:hidden"
+            : "sticky bottom-0 z-20 border-t border-border/60 bg-card/95 backdrop-blur-md md:hidden"
         }
       >
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
           <div className="flex-1 min-w-0">
-            <p className="truncate text-xs text-muted-foreground">{producto.nombre}</p>
-            <p className="text-base font-semibold">
-              {formatMXN(pagoSemanal)}
-              <span className="text-xs font-normal text-muted-foreground">
-                {" "}/ semana
-              </span>
+            <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              {producto.nombre}
             </p>
+            <div className="mt-0.5 flex items-baseline gap-1.5">
+              <span className="text-xl font-bold text-blue-700 dark:text-blue-400">
+                {formatMXN(pagoDiario > 0 ? pagoDiario : pagoSemanal)}
+              </span>
+              <span className="text-[11px] text-muted-foreground">
+                /{pagoDiario > 0 ? "día" : "sem"}
+              </span>
+              {plazoMeses && (
+                <span className="ml-1 rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
+                  {Number.isInteger(plazoMeses) ? `${plazoMeses}m` : `${plazoMeses}m`}
+                </span>
+              )}
+            </div>
           </div>
           <div className="shrink-0">
             <LeadModal

@@ -35,12 +35,12 @@ export function SimuladorCredito({ producto }: Props) {
 
   return (
     <section className="mt-2">
-      <header className="mb-3">
+      <header className="mb-4">
         <h2 className="text-base font-semibold tracking-tight">
           Simula tu crédito
         </h2>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          Elige el plazo. El enganche es del 10% del total.
+        <p className="mt-1 text-xs text-muted-foreground">
+          Elige el plazo que mejor se acomode. El enganche es del 10% del total.
         </p>
       </header>
 
@@ -54,39 +54,59 @@ export function SimuladorCredito({ producto }: Props) {
               onClick={() => setSeleccionado(plan)}
               aria-pressed={activo}
               className={cn(
-                "rounded-lg border bg-card p-4 text-left transition",
-                "hover:-translate-y-0.5 hover:shadow-md",
+                "group/plan relative rounded-xl border bg-card p-4 text-left transition-all duration-300 ease-out",
+                "hover:-translate-y-1 hover:shadow-lg",
                 activo
-                  ? "border-primary ring-2 ring-primary/30"
-                  : "border-border opacity-80 hover:opacity-100"
+                  ? "border-blue-600 shadow-md ring-1 ring-blue-600/20 dark:border-blue-500 dark:ring-blue-500/30"
+                  : "border-border/50 hover:border-blue-300/70 dark:hover:border-blue-700/60"
               )}
             >
-              <div className="flex items-baseline justify-between">
-                <span className="text-sm font-semibold">
+              {/* Marca de selección sutil */}
+              {activo && (
+                <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-500" />
+              )}
+
+              <div className="flex items-baseline justify-between gap-2">
+                <span
+                  className={cn(
+                    "text-sm font-semibold transition-colors",
+                    activo
+                      ? "text-blue-700 dark:text-blue-400"
+                      : "text-foreground"
+                  )}
+                >
                   {formatPlazo(plan.plazoMeses)}
                 </span>
-                <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
                   {plan.semanas} sem
                 </span>
               </div>
+
               <div className="mt-3">
-                <div className="text-2xl font-bold leading-tight tracking-tight">
+                <div className="text-2xl font-bold leading-tight tracking-tight text-foreground">
                   {formatMXN(plan.pagoSemanal)}
                 </div>
-                <div className="text-xs text-muted-foreground">por semana</div>
+                <div className="text-[11px] text-muted-foreground">
+                  por semana
+                </div>
               </div>
-              <dl className="mt-3 space-y-1 text-xs">
-                <div className="flex justify-between">
+
+              <dl className="mt-3 space-y-1.5 border-t border-border/40 pt-3 text-[11px]">
+                <div className="flex items-center justify-between">
                   <dt className="text-muted-foreground">Por día</dt>
-                  <dd>{formatMXN(plan.pagoDiario)}</dd>
+                  <dd className="font-medium tabular-nums text-foreground">
+                    {formatMXN(plan.pagoDiario)}
+                  </dd>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex items-center justify-between">
                   <dt className="text-muted-foreground">Enganche</dt>
-                  <dd>{formatMXN(plan.enganche)}</dd>
+                  <dd className="font-medium tabular-nums text-foreground">
+                    {formatMXN(plan.enganche)}
+                  </dd>
                 </div>
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Total a pagar</dt>
-                  <dd className="font-medium text-foreground">
+                <div className="flex items-center justify-between">
+                  <dt className="text-muted-foreground">Total</dt>
+                  <dd className="font-semibold tabular-nums text-foreground">
                     {formatMXN(plan.total)}
                   </dd>
                 </div>
@@ -96,17 +116,18 @@ export function SimuladorCredito({ producto }: Props) {
         })}
       </div>
 
-      <div className="mt-4 flex flex-col gap-2 rounded-lg border bg-muted/40 p-3 sm:flex-row sm:items-center sm:justify-between dark:bg-zinc-900/40">
+      {/* Caja resumen + CTA — más integrada */}
+      <div className="mt-4 flex flex-col gap-2 rounded-xl border border-border/50 bg-gradient-to-br from-blue-50/60 to-transparent p-4 sm:flex-row sm:items-center sm:justify-between dark:from-blue-950/30 dark:to-transparent">
         <p className="text-xs text-muted-foreground">
           Plan elegido:{" "}
-          <span className="font-medium text-foreground">
+          <span className="font-semibold text-foreground">
             {formatPlazo(seleccionado.plazoMeses)}
           </span>
           {" · "}
-          <span className="font-medium text-foreground">
+          <span className="font-semibold text-blue-700 tabular-nums dark:text-blue-400">
             {formatMXN(seleccionado.pagoSemanal)}
           </span>
-          /semana
+          <span className="text-muted-foreground">/semana</span>
         </p>
         <div className="shrink-0">
           <LeadModal

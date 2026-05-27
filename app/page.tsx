@@ -144,23 +144,12 @@ export default async function Home() {
                       const preview =
                         c.preview_imagen ?? PREVIEW_FALLBACK[c.slug ?? ""];
                       return preview ? (
-                        <>
-                          {/* Ambient: campo de color extendido desde los
-                              bordes de la imagen preview de la categoría. */}
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={preview}
-                            alt=""
-                            aria-hidden
-                            className="absolute inset-0 h-full w-full scale-[3] object-cover blur-[120px]"
-                          />
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={preview}
-                            alt={c.nombre}
-                            className="relative z-10 max-h-full max-w-full object-contain"
-                          />
-                        </>
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={preview}
+                          alt={c.nombre}
+                          className="max-h-full max-w-full object-contain"
+                        />
                       ) : (
                         <span className="text-5xl">
                           {ICONO_FALLBACK[c.slug ?? ""] ?? "🛒"}
