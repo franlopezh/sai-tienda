@@ -54,8 +54,10 @@ export function SimuladorCredito({ producto }: Props) {
               onClick={() => setSeleccionado(plan)}
               aria-pressed={activo}
               className={cn(
-                "group/plan relative rounded-xl border bg-card p-4 text-left transition-all duration-300 ease-out",
+                "group/plan relative cursor-pointer rounded-xl border bg-card p-4 text-left transition-all duration-300 ease-out",
                 "hover:-translate-y-1 hover:shadow-lg",
+                "active:translate-y-0 active:scale-[0.98] active:duration-100",
+                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500",
                 activo
                   ? "border-blue-600 shadow-md ring-1 ring-blue-600/20 dark:border-blue-500 dark:ring-blue-500/30"
                   : "border-border/50 hover:border-blue-300/70 dark:hover:border-blue-700/60"
@@ -83,7 +85,7 @@ export function SimuladorCredito({ producto }: Props) {
               </div>
 
               <div className="mt-3">
-                <div className="text-2xl font-bold leading-tight tracking-tight text-foreground">
+                <div className="font-mono text-2xl font-bold leading-tight tabular-nums tracking-tight text-foreground">
                   {formatMXN(plan.pagoSemanal)}
                 </div>
                 <div className="text-[11px] text-muted-foreground">
@@ -94,19 +96,19 @@ export function SimuladorCredito({ producto }: Props) {
               <dl className="mt-3 space-y-1.5 border-t border-border/40 pt-3 text-[11px]">
                 <div className="flex items-center justify-between">
                   <dt className="text-muted-foreground">Por día</dt>
-                  <dd className="font-medium tabular-nums text-foreground">
+                  <dd className="font-mono font-medium tabular-nums text-foreground">
                     {formatMXN(plan.pagoDiario)}
                   </dd>
                 </div>
                 <div className="flex items-center justify-between">
                   <dt className="text-muted-foreground">Enganche</dt>
-                  <dd className="font-medium tabular-nums text-foreground">
+                  <dd className="font-mono font-medium tabular-nums text-foreground">
                     {formatMXN(plan.enganche)}
                   </dd>
                 </div>
                 <div className="flex items-center justify-between">
                   <dt className="text-muted-foreground">Total</dt>
-                  <dd className="font-semibold tabular-nums text-foreground">
+                  <dd className="font-mono font-semibold tabular-nums text-foreground">
                     {formatMXN(plan.total)}
                   </dd>
                 </div>
@@ -124,7 +126,7 @@ export function SimuladorCredito({ producto }: Props) {
             {formatPlazo(seleccionado.plazoMeses)}
           </span>
           {" · "}
-          <span className="font-semibold text-blue-700 tabular-nums dark:text-blue-400">
+          <span className="font-mono font-semibold tabular-nums text-blue-700 dark:text-blue-400">
             {formatMXN(seleccionado.pagoSemanal)}
           </span>
           <span className="text-muted-foreground">/semana</span>

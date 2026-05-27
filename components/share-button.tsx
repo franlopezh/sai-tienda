@@ -24,7 +24,7 @@ export function ShareButton({ nombre, path }: Props) {
       ? `${window.location.origin}${path}`
       : path;
 
-  const mensaje = `Mira este producto en SAI Shop: ${nombre} — ${urlAbsoluta}`;
+  const mensaje = `Mira este producto en Market SAI: ${nombre} — ${urlAbsoluta}`;
   const whatsappHref = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
 
   async function copiarLink() {
@@ -44,7 +44,7 @@ export function ShareButton({ nombre, path }: Props) {
         onClick={() => setOpen((o) => !o)}
         aria-label="Compartir producto"
         aria-expanded={open}
-        className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-blue-300/80 hover:bg-card hover:text-foreground dark:hover:border-blue-700/60"
+        className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300/80 hover:bg-card hover:text-foreground active:translate-y-0 active:scale-95 active:duration-100 dark:hover:border-blue-700/60"
       >
         <Share2 className="h-3.5 w-3.5" />
         Compartir

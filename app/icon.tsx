@@ -10,26 +10,28 @@ export default function Icon() {
         style={{
           width: "100%",
           height: "100%",
-          background: "#1d4ed8",
+          background: "linear-gradient(135deg, #1e40af 0%, #2563eb 100%)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
         <svg
-          viewBox="0 0 32 16"
-          width={28}
-          height={14}
+          viewBox="0 0 24 24"
+          width={22}
+          height={22}
           fill="none"
           stroke="white"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
-          <path d="M0 8 H6 L9 3 L12 13 L15 6 L18 10 L21 8 H32" />
+          <circle cx="9" cy="21" r="1" />
+          <circle cx="20" cy="21" r="1" />
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
         </svg>
       </div>
     ),
-    { ...size }
+    { ...size },
   );
 }

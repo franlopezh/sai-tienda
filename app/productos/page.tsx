@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { PackageX } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { TodosProductosFiltros } from "@/components/todos-productos-filtros";
+import { EmptyState } from "@/components/empty-state";
 import {
   getCategorias,
   getTodosLosProductos,
@@ -26,7 +28,7 @@ const ORDENES_VALIDOS: OrdenProductos[] = [
 ];
 
 export const metadata = {
-  title: "Todos los productos — SAI Shop",
+  title: "Todos los productos — Market SAI",
 };
 
 export default async function TodosProductosPage({
@@ -76,14 +78,24 @@ export default async function TodosProductosPage({
 
           {productos.length > 0 ? (
             <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {productos.map((p) => (
-                <ProductCard key={p.id} producto={p} />
+              {productos.map((p, idx) => (
+                <ProductCard key={p.id} producto={p} index={idx} />
               ))}
             </div>
           ) : (
-            <div className="rounded-lg border border-dashed border-border bg-muted/50 p-12 text-center text-sm text-muted-foreground">
-              No hay productos que coincidan con los filtros.
-            </div>
+            <EmptyState
+              icon={PackageX}
+              title="Sin productos con esos filtros"
+              description="No hay productos que coincidan con tu selección. Prueba quitar algún filtro o explora por categoría."
+              primaryAction={{
+                label: "Limpiar filtros",
+                href: "/productos",
+              }}
+              secondaryAction={{
+                label: "Volver al inicio",
+                href: "/",
+              }}
+            />
           )}
         </div>
       </main>

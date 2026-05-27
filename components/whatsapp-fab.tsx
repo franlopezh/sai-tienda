@@ -26,7 +26,7 @@ export function WhatsAppFab() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"
-      className="fixed bottom-24 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 transition hover:scale-105 hover:bg-emerald-600 md:bottom-8 md:right-8 md:h-16 md:w-16"
+      className="fixed bottom-24 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 transition-all duration-200 hover:scale-105 hover:bg-emerald-600 active:scale-95 active:duration-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-500 md:bottom-8 md:right-8 md:h-16 md:w-16"
     >
       <MessageCircle className="h-6 w-6 md:h-8 md:w-8" strokeWidth={2.2} />
       <span className="absolute -top-1 -right-1 flex h-3 w-3">

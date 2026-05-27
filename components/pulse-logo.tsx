@@ -1,35 +1,48 @@
+import { cn } from "@/lib/utils";
+
 type Props = {
   className?: string;
-  showText?: boolean;
+  /** Altura del logo en clases tailwind. Default h-10 (40px). */
+  size?: "sm" | "md" | "lg";
+  /**
+   * "default" → logo original (colores azules + texto gris).
+   * "light" → logo en blanco silueta, para usar sobre fondos oscuros (hero overlay).
+   */
+  variant?: "default" | "light";
 };
 
-export function PulseLogo({ className, showText = true }: Props) {
+const SIZE_CLASSES = {
+  sm: "h-7",
+  md: "h-10",
+  lg: "h-14",
+} as const;
+
+export function PulseLogo({
+  className,
+  size = "md",
+  variant = "default",
+}: Props) {
   return (
     <span
-      className={`relative inline-flex items-center justify-center overflow-hidden rounded-md bg-blue-700 px-4 py-1.5 ${className ?? ""}`}
-      aria-label="SAI Shop"
-    >
-      <svg
-        viewBox="0 0 160 36"
-        preserveAspectRatio="none"
-        className="absolute inset-0 h-full w-full text-white/25"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M0 18 H56 L60 18 L66 6 L72 30 L78 10 L84 22 L90 18 H160" />
-      </svg>
-      {showText && (
-        <span
-          className="relative text-xl tracking-wide whitespace-nowrap text-white"
-          style={{ fontFamily: "var(--font-logo)" }}
-        >
-          SAI Shop
-        </span>
+      className={cn(
+        "inline-flex items-center transition-all duration-300",
+        SIZE_CLASSES[size],
+        className,
       )}
+      aria-label="Market SAI"
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/img/logo/market-sai.png"
+        alt="Market SAI"
+        className={cn(
+          "h-full w-auto select-none object-contain transition-[filter] duration-300",
+          variant === "light"
+            ? "[filter:brightness(0)_invert(1)] drop-shadow-md"
+            : "dark:[filter:brightness(0)_invert(1)] dark:drop-shadow-md",
+        )}
+        draggable={false}
+      />
     </span>
   );
 }

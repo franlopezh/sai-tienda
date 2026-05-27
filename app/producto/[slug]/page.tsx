@@ -164,7 +164,7 @@ export default async function ProductoPage({ params }: { params: Params }) {
                 path={`/producto/${producto.slug}`}
               />
             </div>
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight">
+            <h1 className="mt-1 font-sans text-3xl font-semibold tracking-tight">
               {producto.nombre}
             </h1>
 
@@ -174,7 +174,7 @@ export default async function ProductoPage({ params }: { params: Params }) {
                   <p className="text-sm text-muted-foreground">
                     Precio de contado
                   </p>
-                  <p className="text-2xl font-semibold">
+                  <p className="font-mono text-2xl font-semibold tabular-nums">
                     {formatMXN(producto.precio_contado)}
                   </p>
                 </div>
@@ -254,8 +254,8 @@ export default async function ProductoPage({ params }: { params: Params }) {
               . Estos son otros modelos por si quieres comparar.
             </p>
             <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-              {relacionados.map((p) => (
-                <ProductCard key={p.id} producto={p} />
+              {relacionados.map((p, idx) => (
+                <ProductCard key={p.id} producto={p} index={idx} />
               ))}
             </div>
           </section>
@@ -276,14 +276,14 @@ export default async function ProductoPage({ params }: { params: Params }) {
               {producto.nombre}
             </p>
             <div className="mt-0.5 flex items-baseline gap-1.5">
-              <span className="text-xl font-bold text-blue-700 dark:text-blue-400">
+              <span className="font-mono text-xl font-bold tabular-nums text-blue-700 dark:text-blue-400">
                 {formatMXN(pagoDiario > 0 ? pagoDiario : pagoSemanal)}
               </span>
               <span className="text-[11px] text-muted-foreground">
                 /{pagoDiario > 0 ? "día" : "sem"}
               </span>
               {plazoMeses && (
-                <span className="ml-1 rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
+                <span className="ml-1 rounded-full bg-muted px-1.5 py-0.5 font-mono text-[9px] font-medium tabular-nums text-muted-foreground">
                   {Number.isInteger(plazoMeses) ? `${plazoMeses}m` : `${plazoMeses}m`}
                 </span>
               )}

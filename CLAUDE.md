@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# SAI Tienda — contexto del proyecto
+# Market SAI — contexto del proyecto
 
 ## Resumen
 
@@ -42,7 +42,7 @@ app/
   globals.css                   CSS vars + paleta blue-700
 
 components/
-  pulse-logo.tsx                Logo "SAI Tienda" pill azul (Marcellus)
+  pulse-logo.tsx                Logo "Market SAI" — carrito 3D + wordmark
   site-header.tsx               Header sticky con search + theme toggle + nav
   site-footer.tsx               Footer con sucursales + enlaces + redes
   product-card.tsx              Card uniforme: h-44 mobile / h-52 desktop, max-h/w object-contain
@@ -81,7 +81,7 @@ lib/
 - **Cada lead ya guarda `ejecutivo_asignado` y `gerencia_asignada`** en `solicitudes_compra` para tracking.
 - **Tema-aware vía Shadcn vars** — `bg-card`, `text-foreground`, `text-muted-foreground`, `border-border`. NO usar `bg-white`/`text-zinc-X` hardcoded — rompen dark mode.
 - **Imágenes hot-link**: Winmex CDN (zyrosite), Apple newsroom (lineup iPhone 13), Xiaomi mi.com (POCO M7), GadgetPH blogger (nubia V80 Pro back+front), Wikimedia, Unsplash (placeholders categorías sin productos).
-- **Logo pulso** — pill azul `bg-blue-700` con SVG inline tipo electrocardiograma. Texto "SAI Tienda" en Marcellus serif.
+- **Logo Market SAI** — imagen raster (carrito 3D + wordmark "MARKET SAI" gradiente azul). Vive en `public/img/logo/`. Componente `pulse-logo.tsx` lo sirve con `<img>`.
 - **OG image dinámico** por producto vía `next/og` `ImageResponse`.
 
 ## Comandos

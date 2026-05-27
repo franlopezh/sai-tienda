@@ -1,13 +1,15 @@
 import Link from "next/link";
+import { Search, SearchX } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
+import { EmptyState } from "@/components/empty-state";
 import { buscarProductos } from "@/lib/queries";
 
 type Search = Promise<{ q?: string }>;
 
 export const metadata = {
-  title: "Buscar — SAI Shop",
+  title: "Buscar — Market SAI",
 };
 
 export default async function BuscarPage({
@@ -37,15 +39,41 @@ export default async function BuscarPage({
         )}
 
         {q.trim() && productos.length === 0 ? (
-          <div className="mt-8 rounded-lg border border-dashed border-border bg-muted/50 p-12 text-center text-sm text-muted-foreground">
-            Sin resultados para “{q}”. Prueba con un nombre, marca o modelo.
+          <div className="mt-8">
+            <EmptyState
+              icon={SearchX}
+              title={`Sin resultados para "${q}"`}
+              description="Prueba con otro nombre, marca o modelo. También puedes ver el catálogo completo."
+              primaryAction={{
+                label: "Ver todos los productos",
+                href: "/productos",
+              }}
+              secondaryAction={{
+                label: "Volver al inicio",
+                href: "/",
+              }}
+            />
           </div>
         ) : null}
 
+        {!q.trim() && (
+          <div className="mt-8">
+            <EmptyState
+              icon={Search}
+              title="¿Qué estás buscando?"
+              description="Escribe el nombre, marca o modelo que te interesa. Por ejemplo: Honda CB 190, iPhone 13, Smart TV."
+              primaryAction={{
+                label: "Ver todos los productos",
+                href: "/productos",
+              }}
+            />
+          </div>
+        )}
+
         {productos.length > 0 && (
           <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-            {productos.map((p) => (
-              <ProductCard key={p.id} producto={p} />
+            {productos.map((p, idx) => (
+              <ProductCard key={p.id} producto={p} index={idx} />
             ))}
           </div>
         )}

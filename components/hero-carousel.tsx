@@ -52,9 +52,6 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
       aria-roledescription="carousel"
       aria-label="Productos destacados"
     >
-      {/* Fade inferior: difumina hacia la sección de ventajas que se superpone */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-32 bg-gradient-to-t from-background via-background/40 to-transparent" />
-
       <div className="relative">
         {slides.map((slide, idx) => {
           const isActive = idx === current;
@@ -153,7 +150,7 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
               type="button"
               onClick={prev}
               aria-label="Anterior"
-              className="absolute left-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white opacity-0 backdrop-blur transition hover:bg-white/25 group-hover:opacity-100 md:left-4 md:h-12 md:w-12"
+              className="absolute left-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white opacity-0 backdrop-blur transition-all duration-200 hover:scale-110 hover:bg-white/25 active:scale-95 active:duration-100 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:left-4 md:h-12 md:w-12"
             >
               <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
             </button>
@@ -161,7 +158,7 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
               type="button"
               onClick={next}
               aria-label="Siguiente"
-              className="absolute right-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white opacity-0 backdrop-blur transition hover:bg-white/25 group-hover:opacity-100 md:right-4 md:h-12 md:w-12"
+              className="absolute right-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white opacity-0 backdrop-blur transition-all duration-200 hover:scale-110 hover:bg-white/25 active:scale-95 active:duration-100 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:right-4 md:h-12 md:w-12"
             >
               <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
             </button>

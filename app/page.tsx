@@ -174,8 +174,8 @@ export default async function Home() {
           <h2 className="mb-6 text-2xl font-semibold">Más solicitados</h2>
           {restoDestacados.length > 0 ? (
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              {restoDestacados.map((p) => (
-                <ProductCard key={p.id} producto={p} />
+              {restoDestacados.map((p, idx) => (
+                <ProductCard key={p.id} producto={p} index={idx} />
               ))}
             </div>
           ) : (

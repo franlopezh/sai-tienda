@@ -79,7 +79,10 @@ export function SiteHeaderClient({ categorias, overlay = false }: Props) {
           )}
         </button>
         <Link href="/" className="shrink-0">
-          <PulseLogo />
+          <PulseLogo
+            size={isFloatingOverHero ? "lg" : "md"}
+            variant={isFloatingOverHero ? "light" : "default"}
+          />
         </Link>
         <Suspense
           fallback={<div className="hidden md:flex flex-1 max-w-sm mx-6" />}

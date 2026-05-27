@@ -1,15 +1,18 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 
 export function ProductCardSkeleton() {
   return (
-    <Card className="overflow-hidden">
-      <div className="aspect-square animate-pulse bg-muted" />
-      <CardContent className="border-t p-4">
-        <div className="h-3 w-16 animate-pulse rounded bg-muted" />
-        <div className="mt-2 h-4 w-3/4 animate-pulse rounded bg-muted" />
-        <div className="mt-3 h-5 w-24 animate-pulse rounded bg-muted" />
-        <div className="mt-2 h-3 w-32 animate-pulse rounded bg-muted" />
-      </CardContent>
+    <Card className="flex h-full flex-col overflow-hidden rounded-2xl border-border/40 bg-card/70 p-0">
+      <div className="aspect-square w-full animate-pulse bg-muted/60" />
+      <div className="flex flex-1 flex-col items-center gap-2 px-5 pb-5 pt-3">
+        <div className="h-2.5 w-16 animate-pulse rounded-full bg-muted/60" />
+        <div className="mt-1 h-4 w-3/4 animate-pulse rounded bg-muted/60" />
+        <div className="mt-2 h-6 w-28 animate-pulse rounded bg-muted/60" />
+        <div className="mt-1 flex items-center gap-1.5">
+          <div className="h-4 w-10 animate-pulse rounded-full bg-muted/60" />
+          <div className="h-4 w-16 animate-pulse rounded-full bg-muted/60" />
+        </div>
+      </div>
     </Card>
   );
 }

@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PackageX } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { CategoriaFiltros } from "@/components/categoria-filtros";
+import { EmptyState } from "@/components/empty-state";
 import {
   getCategoriaBySlug,
   getProductosPorCategoria,
@@ -76,14 +78,24 @@ export default async function CategoriaPage({
 
           {productos.length > 0 ? (
             <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {productos.map((p) => (
-                <ProductCard key={p.id} producto={p} />
+              {productos.map((p, idx) => (
+                <ProductCard key={p.id} producto={p} index={idx} />
               ))}
             </div>
           ) : (
-            <div className="rounded-lg border border-dashed border-border bg-muted/50 p-12 text-center text-sm text-muted-foreground">
-              No hay productos que coincidan con los filtros.
-            </div>
+            <EmptyState
+              icon={PackageX}
+              title="Sin productos con esos filtros"
+              description="Prueba con otra marca o ajusta el rango de pago semanal. También puedes ver el catálogo completo."
+              primaryAction={{
+                label: "Limpiar filtros",
+                href: `/categoria/${categoria.slug}`,
+              }}
+              secondaryAction={{
+                label: "Ver todos los productos",
+                href: "/productos",
+              }}
+            />
           )}
         </div>
       </main>

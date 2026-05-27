@@ -1,4 +1,4 @@
-# Configuración pnpm para SAI Shop.
+# Configuración pnpm para Market SAI.
 # pnpm bloquea por seguridad los scripts post-install. Aquí decidimos
 # explícitamente qué paquetes pueden ejecutar sus scripts.
 allowBuilds:

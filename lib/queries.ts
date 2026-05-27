@@ -29,14 +29,14 @@ export async function getCategoriasConPreview(): Promise<CategoriaConPreview[]> 
       // Contamos todos los productos (activos + agotados), porque los
       // agotados también se muestran en el listado con su badge.
       const { count } = await supabase
-        .from("productos")
+        .from("productos_publicos")
         .select("id", { count: "exact", head: true })
         .eq("categoria_id", c.id);
 
       // Para el preview de la categoría sí preferimos un producto activo
       // y con imagen.
       const { data: preview } = await supabase
-        .from("productos")
+        .from("productos_publicos")
         .select("imagen_url")
         .eq("categoria_id", c.id)
         .eq("activo", true)
@@ -77,7 +77,7 @@ export async function getProductosDestacados(
   limit = 4
 ): Promise<Producto[]> {
   const { data, error } = await supabase
-    .from("productos")
+    .from("productos_publicos")
     .select(
       "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
     )
@@ -110,7 +110,7 @@ export async function getProductosPorCategoria(
   filtros: FiltrosCategoria = {}
 ): Promise<Producto[]> {
   let query = supabase
-    .from("productos")
+    .from("productos_publicos")
     .select(
       "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
     )
@@ -165,7 +165,7 @@ export async function getTodosLosProductos(
   filtros: FiltrosCategoria & { categoriaId?: string } = {}
 ): Promise<Producto[]> {
   let query = supabase
-    .from("productos")
+    .from("productos_publicos")
     .select(
       "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
     );
@@ -213,7 +213,7 @@ export async function getMarcasPorCategoria(
   categoriaId: string
 ): Promise<string[]> {
   const { data, error } = await supabase
-    .from("productos")
+    .from("productos_publicos")
     .select("marca")
     .eq("categoria_id", categoriaId)
     .eq("activo", true);
@@ -244,7 +244,7 @@ export async function getProductosRelacionados(
   limit = 4
 ): Promise<Producto[]> {
   const { data, error } = await supabase
-    .from("productos")
+    .from("productos_publicos")
     .select(
       "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
     )
@@ -266,7 +266,7 @@ export async function buscarProductos(termino: string): Promise<Producto[]> {
   if (!t) return [];
   const ilike = `%${t}%`;
   const { data, error } = await supabase
-    .from("productos")
+    .from("productos_publicos")
     .select(
       "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
     )
@@ -292,7 +292,7 @@ export async function getProductoBySlug(
   // con badge "Agotado" pueda ver detalle. El componente de detalle se
   // encarga de deshabilitar el lead-modal/simulador cuando activo=false.
   const { data, error } = await supabase
-    .from("productos")
+    .from("productos_publicos")
     .select(
       "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
     )

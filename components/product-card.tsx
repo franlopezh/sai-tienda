@@ -25,9 +25,16 @@ function getBadge(p: Producto): { label: string; tone: string } | null {
   return null;
 }
 
-export function ProductCard({ producto }: { producto: Producto }) {
+export function ProductCard({
+  producto,
+  index = 0,
+}: {
+  producto: Producto;
+  index?: number;
+}) {
   const badge = getBadge(producto);
   const agotado = producto.activo === false;
+  const animationDelay = `${Math.min(index, 11) * 50}ms`;
 
   const precio = producto.precio_contado ?? 0;
   const plan = precio > 0 ? calcularPlanDefault(precio) : null;
@@ -38,7 +45,10 @@ export function ProductCard({ producto }: { producto: Producto }) {
 
   return (
     <Link href={`/producto/${producto.slug}`} className="group block h-full">
-      <Card className="flex h-full flex-col overflow-hidden rounded-2xl border-border/40 bg-card/70 p-0 transition-all duration-300 hover:-translate-y-1 hover:border-blue-300/60 hover:shadow-xl dark:hover:border-blue-700/60 animate-in fade-in-0 slide-in-from-bottom-2 fill-mode-both">
+      <Card
+        className="flex h-full flex-col overflow-hidden rounded-2xl border-border/40 bg-card/70 p-0 transition-all duration-300 hover:-translate-y-1 hover:border-blue-300/60 hover:shadow-xl active:translate-y-0 active:scale-[0.99] active:duration-100 dark:hover:border-blue-700/60 animate-in fade-in-0 slide-in-from-bottom-3 fill-mode-both"
+        style={{ animationDuration: "500ms", animationDelay }}
+      >
         {/* Imagen flotante aspect-square */}
         <div className="relative aspect-square w-full overflow-hidden">
           {badge && (
@@ -73,27 +83,27 @@ export function ProductCard({ producto }: { producto: Producto }) {
               {producto.marca.trim()}
             </p>
           )}
-          <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground md:text-base">
+          <h3 className="line-clamp-2 font-sans text-sm font-semibold leading-snug tracking-normal text-foreground md:text-base">
             {producto.nombre}
           </h3>
 
           {/* Precio principal centrado */}
           {pagoDiario > 0 ? (
-            <p className="mt-1 text-xl font-bold tracking-tight text-foreground">
+            <p className="mt-1 font-mono text-xl font-bold tabular-nums tracking-tight text-foreground">
               {formatMXN(pagoDiario)}
-              <span className="ml-1 text-xs font-normal text-muted-foreground">
+              <span className="ml-1 font-sans text-xs font-normal text-muted-foreground">
                 / día
               </span>
             </p>
           ) : pagoSemanal > 0 ? (
-            <p className="mt-1 text-xl font-bold tracking-tight text-foreground">
+            <p className="mt-1 font-mono text-xl font-bold tabular-nums tracking-tight text-foreground">
               {formatMXN(pagoSemanal)}
-              <span className="ml-1 text-xs font-normal text-muted-foreground">
+              <span className="ml-1 font-sans text-xs font-normal text-muted-foreground">
                 / semana
               </span>
             </p>
           ) : precio > 0 ? (
-            <p className="mt-1 text-xl font-bold tracking-tight text-foreground">
+            <p className="mt-1 font-mono text-xl font-bold tabular-nums tracking-tight text-foreground">
               {formatMXN(precio)}
             </p>
           ) : null}
@@ -102,7 +112,7 @@ export function ProductCard({ producto }: { producto: Producto }) {
           {(plazoMeses || enganche > 0) && (
             <div className="mt-1 flex items-center justify-center gap-1.5">
               {plazoMeses && (
-                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                <span className="rounded-full bg-muted px-2 py-0.5 font-mono text-[10px] font-medium tabular-nums text-muted-foreground">
                   {Number.isInteger(plazoMeses)
                     ? `${plazoMeses} m`
                     : `${plazoMeses} m`}
@@ -110,7 +120,8 @@ export function ProductCard({ producto }: { producto: Producto }) {
               )}
               {enganche > 0 && (
                 <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                  Eng. {formatMXN(enganche)}
+                  <span className="font-sans">Eng. </span>
+                  <span className="font-mono tabular-nums">{formatMXN(enganche)}</span>
                 </span>
               )}
             </div>

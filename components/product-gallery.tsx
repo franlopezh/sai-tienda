@@ -55,7 +55,7 @@ export function ProductGallery({ imagenes, nombre }: Props) {
               aria-label={`Ver imagen ${idx + 1}`}
               aria-pressed={idx === indexActivo}
               className={cn(
-                "group/thumb relative aspect-square w-full overflow-hidden rounded-lg border-2 bg-card p-2 transition-all duration-200",
+                "group/thumb relative aspect-square w-full cursor-pointer overflow-hidden rounded-lg border-2 bg-card p-2 transition-all duration-200 active:scale-95 active:duration-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500",
                 idx === indexActivo
                   ? "border-blue-600 shadow-md dark:border-blue-500"
                   : "border-border/40 hover:border-blue-300/80 hover:shadow-md dark:hover:border-blue-700/60"

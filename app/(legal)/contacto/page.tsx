@@ -1,7 +1,7 @@
 import { WhatsAppLink } from "@/components/whatsapp-link";
 
 export const metadata = {
-  title: "Contacto — SAI Shop",
+  title: "Contacto — Market SAI",
 };
 
 const SUCURSALES = [

@@ -3,7 +3,7 @@ import { getProductoBySlug } from "@/lib/queries";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "SAI Shop";
+export const alt = "Market SAI";
 
 export default async function OpenGraphImage({
   params,
@@ -12,7 +12,7 @@ export default async function OpenGraphImage({
 }) {
   const producto = await getProductoBySlug(params.slug);
 
-  const nombre = producto?.nombre ?? "SAI Shop";
+  const nombre = producto?.nombre ?? "Market SAI";
   const marca = producto?.marca?.trim() ?? "";
   const pagoSemanal = producto?.pago_semanal ?? 0;
   const pagoDiario = producto?.pago_diario ?? 0;
@@ -47,20 +47,30 @@ export default async function OpenGraphImage({
             flex: 1,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <svg
-              viewBox="0 0 80 24"
-              width={64}
-              height={20}
+              viewBox="0 0 24 24"
+              width={40}
+              height={40}
               fill="none"
               stroke="white"
-              strokeWidth="2.5"
+              strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <path d="M0 12 H18 L22 12 L26 4 L30 20 L34 8 L38 14 L42 12 H80" />
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
-            <span style={{ fontSize: 28, fontWeight: 600 }}>SAI Shop</span>
+            <span
+              style={{
+                fontSize: 32,
+                fontWeight: 700,
+                letterSpacing: 1,
+              }}
+            >
+              MARKET SAI
+            </span>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column" }}>
