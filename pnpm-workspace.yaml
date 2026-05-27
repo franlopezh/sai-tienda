@@ -1,0 +1,7 @@
+# Configuración pnpm para SAI Shop.
+# pnpm bloquea por seguridad los scripts post-install. Aquí decidimos
+# explícitamente qué paquetes pueden ejecutar sus scripts.
+allowBuilds:
+  sharp: true # optimización de imágenes (Vercel lo usa aunque no usemos next/image)
+  unrs-resolver: true # resolver de módulos para Turbopack/SWC
+  msw: false # mock service worker — solo para tests, no se necesita en runtime
