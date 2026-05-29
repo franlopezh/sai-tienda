@@ -46,7 +46,7 @@ export function ProductCard({
   return (
     <Link href={`/producto/${producto.slug}`} className="group block h-full">
       <Card
-        className="flex h-full flex-col overflow-hidden rounded-2xl border-border/40 bg-white p-0 transition-all duration-300 hover:-translate-y-1 hover:border-blue-300/60 hover:shadow-xl active:translate-y-0 active:scale-[0.99] active:duration-100 dark:hover:border-blue-700/60 animate-in fade-in-0 slide-in-from-bottom-3 fill-mode-both"
+        className="flex h-full flex-col overflow-hidden rounded-2xl border-border/40 bg-white p-0 transition-all duration-300 hover:-translate-y-1 hover:border-blue-300/60 hover:shadow-xl active:translate-y-0 active:scale-[0.99] active:duration-100 dark:bg-card dark:hover:border-blue-700/60 animate-in fade-in-0 slide-in-from-bottom-3 fill-mode-both"
         style={{ animationDuration: "500ms", animationDelay }}
       >
         {/* Imagen flotante aspect-square */}
