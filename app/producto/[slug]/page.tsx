@@ -15,7 +15,7 @@ import {
   getProductosRelacionados,
   getCategoriaById,
 } from "@/lib/queries";
-import { calcularPlanDefault } from "@/lib/credito";
+import { calcularPlanDefault, getPrecioPublico } from "@/lib/credito";
 import { ProductCard } from "@/components/product-card";
 
 type Params = Promise<{ slug: string }>;
@@ -63,7 +63,8 @@ export default async function ProductoPage({ params }: { params: Params }) {
       ? [producto.imagen_url]
       : [];
 
-  const planDefault = calcularPlanDefault(producto.precio_contado ?? 0);
+  const precioPublico = getPrecioPublico(producto);
+  const planDefault = calcularPlanDefault(precioPublico);
   const pagoSemanal = planDefault?.pagoSemanal ?? 0;
   const pagoDiario = planDefault?.pagoDiario ?? 0;
   const semanasEstimadas = planDefault?.semanas ?? 52;
@@ -169,13 +170,13 @@ export default async function ProductoPage({ params }: { params: Params }) {
             </h1>
 
             <div className="mt-6 space-y-3">
-              {producto.precio_contado > 0 && (
+              {precioPublico > 0 && (
                 <div>
                   <p className="text-sm text-muted-foreground">
                     Precio de contado
                   </p>
                   <p className="font-mono text-2xl font-semibold tabular-nums">
-                    {formatMXN(producto.precio_contado)}
+                    {formatMXN(precioPublico)}
                   </p>
                 </div>
               )}

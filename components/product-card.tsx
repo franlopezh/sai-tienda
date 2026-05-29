@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 import { formatMXN } from "@/lib/format";
-import { calcularPlanDefault } from "@/lib/credito";
+import { calcularPlanDefault, getPrecioPublico } from "@/lib/credito";
 import { cn } from "@/lib/utils";
 import type { Producto } from "@/lib/types";
 
@@ -36,7 +36,7 @@ export function ProductCard({
   const agotado = producto.activo === false;
   const animationDelay = `${Math.min(index, 11) * 50}ms`;
 
-  const precio = producto.precio_contado ?? 0;
+  const precio = getPrecioPublico(producto);
   const plan = precio > 0 ? calcularPlanDefault(precio) : null;
   const pagoDiario = plan?.pagoDiario ?? producto.pago_diario ?? 0;
   const pagoSemanal = plan?.pagoSemanal ?? producto.pago_semanal ?? 0;

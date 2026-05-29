@@ -38,10 +38,10 @@ const CONFIG_POR_SEGMENTO: Record<Segmento, ConfigPlazo[]> = {
   // Productos baratos (precio_contado < $7,000): celulares de gama media,
   // accesorios, productos chicos. Plazos cortos.
   pequenos: [
-    { plazo: 3, semanas: 12, dias: 72, multiplicador: 1.5, interesPct: 50 },
-    { plazo: 4.5, semanas: 18, dias: 108, multiplicador: 1.7, interesPct: 70 },
-    { plazo: 6, semanas: 26, dias: 156, multiplicador: 2.0, interesPct: 100 },
-    { plazo: 7.5, semanas: 32, dias: 192, multiplicador: 2.2, interesPct: 120 },
+    { plazo: 3, semanas: 12, dias: 72, multiplicador: 1.45, interesPct: 45 },
+    { plazo: 4.5, semanas: 18, dias: 108, multiplicador: 1.6, interesPct: 60 },
+    { plazo: 6, semanas: 26, dias: 156, multiplicador: 1.75, interesPct: 75 },
+    { plazo: 7.5, semanas: 32, dias: 192, multiplicador: 1.9, interesPct: 90 },
   ],
   // Productos de precio medio ($7,000–$14,999): celulares de gama alta,
   // TVs medianas, motonetas baratas.
@@ -69,6 +69,20 @@ const PLAZO_DEFAULT_POR_SEGMENTO: Record<Segmento, number> = {
 
 const ENGANCHE_PCT = 0.1;
 const DIAS_POR_SEMANA = 6;
+
+/**
+ * Precio público que ve el cliente y base para los plazos de financiamiento.
+ * `precio_credito` (con markup ya aplicado por el admin SAI) es la fuente de
+ * verdad. Fallback a `precio_contado` para productos legacy sin precio_credito.
+ */
+export function getPrecioPublico(producto: {
+  precio_contado: number;
+  precio_credito: number;
+}): number {
+  return producto.precio_credito > 0
+    ? producto.precio_credito
+    : producto.precio_contado;
+}
 
 export function getSegmento(precio: number): Segmento {
   if (precio < 7000) return "pequenos";

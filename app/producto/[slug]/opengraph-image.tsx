@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getProductoBySlug } from "@/lib/queries";
+import { calcularPlanDefault, getPrecioPublico } from "@/lib/credito";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -14,8 +15,11 @@ export default async function OpenGraphImage({
 
   const nombre = producto?.nombre ?? "Market SAI";
   const marca = producto?.marca?.trim() ?? "";
-  const pagoSemanal = producto?.pago_semanal ?? 0;
-  const pagoDiario = producto?.pago_diario ?? 0;
+  const planDefault = producto
+    ? calcularPlanDefault(getPrecioPublico(producto))
+    : null;
+  const pagoSemanal = planDefault?.pagoSemanal ?? producto?.pago_semanal ?? 0;
+  const pagoDiario = planDefault?.pagoDiario ?? producto?.pago_diario ?? 0;
   const imagen = producto?.imagen_url ?? null;
 
   const formatMXN = (v: number) =>

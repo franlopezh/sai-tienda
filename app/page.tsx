@@ -6,7 +6,7 @@ import { ProductCard } from "@/components/product-card";
 import { Testimonios } from "@/components/testimonios";
 import { HeroCarousel, type HeroSlide } from "@/components/hero-carousel";
 import { getCategoriasConPreview, getProductosDestacados } from "@/lib/queries";
-import { calcularPlanDefault } from "@/lib/credito";
+import { calcularPlanDefault, getPrecioPublico } from "@/lib/credito";
 import { formatMXN } from "@/lib/format";
 import {
   ShieldCheck,
@@ -41,7 +41,7 @@ export default async function Home() {
 
   // Curated: si hay destacados, arma slides. Si no, deja al menos el slide genérico SAI.
   const slidesProductos: HeroSlide[] = destacadosConImagen.map((p, idx) => {
-    const plan = calcularPlanDefault(p.precio_contado ?? 0);
+    const plan = calcularPlanDefault(getPrecioPublico(p));
     const desde = plan?.pagoDiario ?? p.pago_diario ?? 0;
     // Gradientes más oscuros para integrar mejor con bg-background (dark)
     // y que el fade arriba/abajo del carrusel se vea natural.

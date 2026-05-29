@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import {
   calcularPlanes,
   getPlazoDefault,
+  getPrecioPublico,
   type PlanCredito,
 } from "@/lib/credito";
 import { formatMXN } from "@/lib/format";
@@ -20,7 +21,7 @@ function formatPlazo(meses: number): string {
 }
 
 export function SimuladorCredito({ producto }: Props) {
-  const precio = producto.precio_contado ?? 0;
+  const precio = getPrecioPublico(producto);
   const planes = useMemo(() => calcularPlanes(precio), [precio]);
   const planDefault =
     planes.find((p) => p.plazo === getPlazoDefault(precio)) ?? planes[0];
