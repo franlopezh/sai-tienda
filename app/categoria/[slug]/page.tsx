@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PackageX } from "lucide-react";
+import { PackageX, PackageOpen } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
@@ -47,6 +47,7 @@ export default async function CategoriaPage({
     : "nombre";
   const semanalMin = sp.semanalMin ? Number(sp.semanalMin) : undefined;
   const semanalMax = sp.semanalMax ? Number(sp.semanalMax) : undefined;
+  const hayFiltros = !!(sp.marca || sp.semanalMin || sp.semanalMax);
 
   const [productos, marcas] = await Promise.all([
     getProductosPorCategoria(categoria.id, {
@@ -82,7 +83,7 @@ export default async function CategoriaPage({
                 <ProductCard key={p.id} producto={p} index={idx} />
               ))}
             </div>
-          ) : (
+          ) : hayFiltros ? (
             <EmptyState
               icon={PackageX}
               title="Sin productos con esos filtros"
@@ -94,6 +95,20 @@ export default async function CategoriaPage({
               secondaryAction={{
                 label: "Ver todos los productos",
                 href: "/productos",
+              }}
+            />
+          ) : (
+            <EmptyState
+              icon={PackageOpen}
+              title="Aún no hay artículos a la venta"
+              description={`Estamos preparando la oferta de ${categoria.nombre}. Mientras tanto, mira el resto del catálogo o vuelve más tarde.`}
+              primaryAction={{
+                label: "Ver todos los productos",
+                href: "/productos",
+              }}
+              secondaryAction={{
+                label: "Volver al inicio",
+                href: "/",
               }}
             />
           )}

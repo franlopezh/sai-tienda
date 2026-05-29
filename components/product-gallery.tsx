@@ -21,7 +21,7 @@ export function ProductGallery({ imagenes, nombre }: Props) {
 
   if (imagenes.length === 0) {
     return (
-      <div className="flex h-80 w-full items-center justify-center rounded-xl border border-border/60 bg-card p-6 text-muted-foreground/70 md:h-[440px]">
+      <div className="flex h-80 w-full items-center justify-center rounded-xl border border-border/60 bg-white p-6 text-muted-foreground/70 md:h-[440px]">
         <span className="text-7xl">📦</span>
       </div>
     );
@@ -39,7 +39,7 @@ export function ProductGallery({ imagenes, nombre }: Props) {
         <ImageZoom
           src={activa}
           alt={nombre}
-          containerClassName="h-80 w-full rounded-xl border border-border/60 bg-card p-6 md:h-[440px]"
+          containerClassName="h-80 w-full rounded-xl border border-border/60 bg-white p-6 md:h-[440px]"
           imageClassName="p-2"
         />
       </div>
@@ -55,7 +55,7 @@ export function ProductGallery({ imagenes, nombre }: Props) {
               aria-label={`Ver imagen ${idx + 1}`}
               aria-pressed={idx === indexActivo}
               className={cn(
-                "group/thumb relative aspect-square w-full cursor-pointer overflow-hidden rounded-lg border-2 bg-card p-2 transition-all duration-200 active:scale-95 active:duration-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500",
+                "group/thumb relative aspect-square w-full cursor-pointer overflow-hidden rounded-lg border-2 bg-white p-2 transition-all duration-200 active:scale-95 active:duration-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500",
                 idx === indexActivo
                   ? "border-blue-600 shadow-md dark:border-blue-500"
                   : "border-border/40 hover:border-blue-300/80 hover:shadow-md dark:hover:border-blue-700/60"

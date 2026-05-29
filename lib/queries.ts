@@ -59,11 +59,13 @@ export async function getCategoriasConPreview(): Promise<CategoriaConPreview[]> 
 export async function getCategoriaBySlug(
   slug: string
 ): Promise<Categoria | null> {
+  // No filtramos por `activo`: una categoría sin productos puede estar
+  // marcada como inactiva en el admin, y aún así queremos mostrarla con
+  // el empty state ("aún no hay artículos") en vez de un 404 frío.
   const { data, error } = await supabase
     .from("categorias_productos")
     .select("id, nombre, slug, icono, orden, activo")
     .eq("slug", slug)
-    .eq("activo", true)
     .maybeSingle();
 
   if (error) {

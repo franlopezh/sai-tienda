@@ -46,11 +46,11 @@ export function ProductCard({
   return (
     <Link href={`/producto/${producto.slug}`} className="group block h-full">
       <Card
-        className="flex h-full flex-col overflow-hidden rounded-2xl border-border/40 bg-card/70 p-0 transition-all duration-300 hover:-translate-y-1 hover:border-blue-300/60 hover:shadow-xl active:translate-y-0 active:scale-[0.99] active:duration-100 dark:hover:border-blue-700/60 animate-in fade-in-0 slide-in-from-bottom-3 fill-mode-both"
+        className="flex h-full flex-col overflow-hidden rounded-2xl border-border/40 bg-white p-0 transition-all duration-300 hover:-translate-y-1 hover:border-blue-300/60 hover:shadow-xl active:translate-y-0 active:scale-[0.99] active:duration-100 dark:hover:border-blue-700/60 animate-in fade-in-0 slide-in-from-bottom-3 fill-mode-both"
         style={{ animationDuration: "500ms", animationDelay }}
       >
         {/* Imagen flotante aspect-square */}
-        <div className="relative aspect-square w-full overflow-hidden">
+        <div className="relative aspect-square w-full overflow-hidden bg-white">
           {badge && (
             <span
               className={`absolute left-3 top-3 z-10 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider shadow-sm backdrop-blur-sm ${badge.tone}`}
@@ -65,7 +65,7 @@ export function ProductCard({
               alt={producto.nombre}
               loading="lazy"
               className={cn(
-                "absolute inset-0 h-full w-full object-contain p-8 drop-shadow-2xl transition-transform duration-500 ease-out group-hover:-translate-y-2",
+                "absolute inset-0 h-full w-full object-contain p-8 transition-transform duration-500 ease-out group-hover:-translate-y-2",
                 agotado && "opacity-60 grayscale"
               )}
             />
