@@ -9,7 +9,10 @@ import type { Producto } from "@/lib/types";
 const DIAS_NUEVO = 30;
 
 function getBadge(p: Producto): { label: string; tone: string } | null {
-  if (p.activo === false) {
+  // `agotado` lo calcula la BD por categoria: celulares/tecnologia se agotan
+  // por stock; motos/llantas nunca (se consulta al proveedor). Incluye tambien
+  // los productos inactivos.
+  if (p.agotado) {
     return { label: "Agotado", tone: "bg-zinc-700/90 text-white" };
   }
   const ahora = Date.now();
@@ -33,7 +36,7 @@ export function ProductCard({
   index?: number;
 }) {
   const badge = getBadge(producto);
-  const agotado = producto.activo === false;
+  const agotado = producto.agotado === true;
   const animationDelay = `${Math.min(index, 11) * 50}ms`;
 
   const precio = getPrecioPublico(producto);

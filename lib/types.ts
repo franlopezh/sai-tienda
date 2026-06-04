@@ -20,7 +20,16 @@ export type Producto = {
   marca?: string | null;
   modelo?: string | null;
   ficha_tecnica_url?: string | null;
+  /** Colores disponibles derivados del inventario (unidades en stock).
+   * Se mantienen en `productos.colores_disponibles` via trigger en la BD. */
+  colores_disponibles?: string[] | null;
   stock?: number | null;
+  /** Unidades en stock (inventario). Mantenido por trigger en la BD. */
+  disponibles?: number | null;
+  /** Agotado calculado en la BD por categoria: celulares/tecnologia se agotan
+   * cuando no hay unidades; motos/llantas nunca (se consulta al proveedor).
+   * Incluye tambien los productos inactivos. */
+  agotado?: boolean | null;
   activo?: boolean;
   pago_semanal?: number;
   pago_diario?: number;

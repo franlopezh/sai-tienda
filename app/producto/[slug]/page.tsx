@@ -8,7 +8,7 @@ import { ProductGallery } from "@/components/product-gallery";
 import { ShareButton } from "@/components/share-button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, Clock4, Truck, ChevronRight, Wrench } from "lucide-react";
+import { ShieldCheck, Clock4, Truck, ChevronRight, Wrench, Palette } from "lucide-react";
 import { formatMXN } from "@/lib/format";
 import {
   getProductoBySlug,
@@ -46,6 +46,47 @@ function parseDescripcion(desc: string): {
   return { specs, texto: otrasLineas.join("\n") };
 }
 
+/**
+ * Mapea nombres de color comunes (en español) a un color CSS para el puntito
+ * de muestra junto al chip. Si no se reconoce, se usa un gris neutro.
+ */
+function swatchColor(nombre: string): string {
+  const n = nombre
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .trim();
+  const mapa: Record<string, string> = {
+    negro: "#1a1a1a",
+    blanco: "#f5f5f5",
+    gris: "#9ca3af",
+    plata: "#c0c0c0",
+    plateado: "#c0c0c0",
+    dorado: "#d4af37",
+    oro: "#d4af37",
+    azul: "#2563eb",
+    "azul claro": "#60a5fa",
+    "azul oscuro": "#1e3a8a",
+    celeste: "#7dd3fc",
+    rojo: "#dc2626",
+    rosa: "#ec4899",
+    rosado: "#ec4899",
+    verde: "#16a34a",
+    "verde menta": "#6ee7b7",
+    amarillo: "#facc15",
+    naranja: "#f97316",
+    morado: "#7c3aed",
+    violeta: "#8b5cf6",
+    "violeta claro": "#c4b5fd",
+    lila: "#c4b5fd",
+    cafe: "#92400e",
+    marron: "#92400e",
+    beige: "#e7d8c0",
+    turquesa: "#14b8a6",
+  };
+  return mapa[n] ?? "#9ca3af";
+}
+
 export default async function ProductoPage({ params }: { params: Params }) {
   const { slug } = await params;
   const producto = await getProductoBySlug(slug);
@@ -69,11 +110,13 @@ export default async function ProductoPage({ params }: { params: Params }) {
   const pagoDiario = planDefault?.pagoDiario ?? 0;
   const semanasEstimadas = planDefault?.semanas ?? 52;
   const plazoMeses = planDefault?.plazoMeses ?? null;
-  const agotado = producto.activo === false;
+  const agotado = producto.agotado === true;
 
   const descripcionParsed = producto.descripcion
     ? parseDescripcion(producto.descripcion)
     : null;
+
+  const colores = producto.colores_disponibles ?? [];
 
   return (
     <div className="flex flex-col flex-1">
@@ -140,6 +183,37 @@ export default async function ProductoPage({ params }: { params: Params }) {
                       </div>
                     ))}
                   </dl>
+                </div>
+              </section>
+            )}
+
+            {/* Colores disponibles — derivados del inventario en stock */}
+            {colores.length > 0 && (
+              <section
+                className="mt-5 animate-in fade-in-0 slide-in-from-bottom-4 fill-mode-both"
+                style={{ animationDuration: "700ms", animationDelay: "500ms" }}
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                    <Palette className="h-3.5 w-3.5" />
+                  </span>
+                  <h2 className="text-sm font-semibold tracking-tight text-foreground">
+                    Colores disponibles
+                  </h2>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {colores.map((c) => (
+                    <span
+                      key={c}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/60 px-2.5 py-1 text-xs font-medium text-foreground"
+                    >
+                      <span
+                        className="h-3 w-3 shrink-0 rounded-full border border-black/10 shadow-sm dark:border-white/20"
+                        style={{ backgroundColor: swatchColor(c) }}
+                      />
+                      {c}
+                    </span>
+                  ))}
                 </div>
               </section>
             )}

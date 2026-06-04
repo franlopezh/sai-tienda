@@ -81,7 +81,7 @@ export async function getProductosDestacados(
   const { data, error } = await supabase
     .from("productos_publicos")
     .select(
-      "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
+      "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at, agotado, disponibles"
     )
     .eq("activo", true)
     .limit(limit);
@@ -114,14 +114,14 @@ export async function getProductosPorCategoria(
   let query = supabase
     .from("productos_publicos")
     .select(
-      "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
+      "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at, agotado, disponibles"
     )
     .eq("categoria_id", categoriaId);
 
   if (filtros.marca) query = query.eq("marca", filtros.marca);
 
   // Siempre activos primero, agotados al final (independiente del orden secundario).
-  query = query.order("activo", { ascending: false });
+  query = query.order("agotado", { ascending: true });
 
   switch (filtros.orden) {
     case "credito_asc":
@@ -169,14 +169,14 @@ export async function getTodosLosProductos(
   let query = supabase
     .from("productos_publicos")
     .select(
-      "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
+      "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at, agotado, disponibles"
     );
 
   if (filtros.categoriaId) query = query.eq("categoria_id", filtros.categoriaId);
   if (filtros.marca) query = query.eq("marca", filtros.marca);
 
   // Activos primero, agotados al final.
-  query = query.order("activo", { ascending: false });
+  query = query.order("agotado", { ascending: true });
 
   switch (filtros.orden) {
     case "credito_asc":
@@ -248,7 +248,7 @@ export async function getProductosRelacionados(
   const { data, error } = await supabase
     .from("productos_publicos")
     .select(
-      "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
+      "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at, agotado, disponibles"
     )
     .eq("categoria_id", categoriaId)
     .eq("activo", true)
@@ -270,12 +270,12 @@ export async function buscarProductos(termino: string): Promise<Producto[]> {
   const { data, error } = await supabase
     .from("productos_publicos")
     .select(
-      "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
+      "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at, agotado, disponibles"
     )
     .or(
       `nombre.ilike.${ilike},marca.ilike.${ilike},modelo.ilike.${ilike}`
     )
-    .order("activo", { ascending: false })
+    .order("agotado", { ascending: true })
     .order("nombre", { ascending: true })
     .limit(60);
 
@@ -296,7 +296,7 @@ export async function getProductoBySlug(
   const { data, error } = await supabase
     .from("productos_publicos")
     .select(
-      "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at"
+      "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, colores_disponibles, stock, activo, pago_semanal, pago_diario, enganche, created_at, agotado, disponibles"
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -357,7 +357,12 @@ function mapProducto(row: Record<string, unknown>): Producto {
     marca: (row.marca as string) ?? null,
     modelo: (row.modelo as string) ?? null,
     ficha_tecnica_url: (row.ficha_tecnica_url as string) ?? null,
+    colores_disponibles: Array.isArray(row.colores_disponibles)
+      ? (row.colores_disponibles as string[])
+      : null,
     stock: typeof row.stock === "number" ? row.stock : null,
+    disponibles: typeof row.disponibles === "number" ? row.disponibles : null,
+    agotado: row.agotado === true,
     activo: row.activo as boolean,
     pago_semanal: parseNum(row.pago_semanal),
     pago_diario: parseNum(row.pago_diario),
