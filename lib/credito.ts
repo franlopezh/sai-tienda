@@ -67,6 +67,15 @@ const PLAZO_DEFAULT_POR_SEGMENTO: Record<Segmento, number> = {
   grandes: 12,
 };
 
+// Slug de la categoría de motos en Supabase (categorias_productos).
+export const CATEGORIA_MOTOS_SLUG = "motocicletas";
+
+// Regla de negocio (jul 2026): las motos dejaron de ofrecer el plazo de 15 meses.
+// El resto de categorías conserva todos los plazos de su segmento de precio.
+const PLAZOS_EXCLUIDOS_POR_CATEGORIA: Record<string, number[]> = {
+  [CATEGORIA_MOTOS_SLUG]: [15],
+};
+
 const ENGANCHE_PCT = 0.1;
 const DIAS_POR_SEMANA = 6;
 
@@ -126,9 +135,16 @@ export function calcularPlan(
   };
 }
 
-export function calcularPlanes(precio: number): PlanCredito[] {
+export function calcularPlanes(
+  precio: number,
+  categoriaSlug?: string | null
+): PlanCredito[] {
   const segmento = getSegmento(precio);
+  const excluidos = categoriaSlug
+    ? (PLAZOS_EXCLUIDOS_POR_CATEGORIA[categoriaSlug] ?? [])
+    : [];
   return CONFIG_POR_SEGMENTO[segmento]
+    .filter((c) => !excluidos.includes(c.plazo))
     .map((c) => calcularPlan(precio, c.plazo))
     .filter((p): p is PlanCredito => p !== null);
 }

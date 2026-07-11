@@ -14,15 +14,21 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   producto: Producto;
+  /** Slug de la categoría del producto. Se usa para aplicar reglas de plazos
+   * por categoría (p. ej. las motos ya no ofrecen el plazo de 15 meses). */
+  categoriaSlug?: string | null;
 };
 
 function formatPlazo(meses: number): string {
   return Number.isInteger(meses) ? `${meses} meses` : `${meses} meses`;
 }
 
-export function SimuladorCredito({ producto }: Props) {
+export function SimuladorCredito({ producto, categoriaSlug }: Props) {
   const precio = getPrecioPublico(producto);
-  const planes = useMemo(() => calcularPlanes(precio), [precio]);
+  const planes = useMemo(
+    () => calcularPlanes(precio, categoriaSlug),
+    [precio, categoriaSlug]
+  );
   const planDefault =
     planes.find((p) => p.plazo === getPlazoDefault(precio)) ?? planes[0];
   const [seleccionado, setSeleccionado] = useState<PlanCredito>(planDefault);

@@ -268,7 +268,10 @@ export default async function ProductoPage({ params }: { params: Params }) {
                   </p>
                 </div>
               ) : (
-                <SimuladorCredito producto={producto} />
+                <SimuladorCredito
+                  producto={producto}
+                  categoriaSlug={categoria?.slug}
+                />
               )}
             </div>
 
