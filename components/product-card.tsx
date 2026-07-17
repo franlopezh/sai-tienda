@@ -22,9 +22,9 @@ function getBadge(p: Producto): { label: string; tone: string } | null {
   if (esNuevo) {
     return { label: "Nuevo", tone: "bg-blue-600 text-white" };
   }
-  if (!p.enganche || p.enganche === 0) {
-    return { label: "Sin enganche", tone: "bg-emerald-600 text-white" };
-  }
+  // No hay badge "Sin enganche": el crédito siempre aplica 10% de enganche
+  // calculado sobre precio_credito (ver lib/credito.ts). La columna legacy
+  // productos.enganche puede venir NULL/0 y no refleja el enganche real.
   return null;
 }
 
