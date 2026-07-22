@@ -17,7 +17,10 @@ export function SearchInput() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="hidden md:flex flex-1 max-w-sm mx-6">
+    <form
+      onSubmit={onSubmit}
+      className="hidden min-w-40 md:flex flex-1 max-w-sm mx-6"
+    >
       <Input
         type="search"
         value={q}

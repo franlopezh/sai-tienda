@@ -2,7 +2,8 @@
 
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu as MenuPrimitive } from "@base-ui/react/menu";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { SearchInput } from "@/components/search-input";
 import { PulseLogo } from "@/components/pulse-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -85,25 +86,49 @@ export function SiteHeaderClient({ categorias, overlay = false }: Props) {
           />
         </Link>
         <Suspense
-          fallback={<div className="hidden md:flex flex-1 max-w-sm mx-6" />}
+          fallback={
+            <div className="hidden min-w-40 md:flex flex-1 max-w-sm mx-6" />
+          }
         >
           <SearchInput />
         </Suspense>
-        <nav className="hidden gap-5 text-sm lg:flex">
-          {categorias.map((c) => (
-            <Link
-              key={c.id}
-              href={`/categoria/${c.slug}`}
+        {/* Desktop: dropdown "Categorías" en vez de N links inline — escala a
+            cualquier número de categorías sin comerse el espacio del buscador */}
+        <nav className="hidden shrink-0 items-center gap-5 text-sm lg:flex">
+          <MenuPrimitive.Root>
+            <MenuPrimitive.Trigger
               className={cn(
-                "transition-colors",
+                "group flex cursor-pointer items-center gap-1 whitespace-nowrap transition-colors outline-none",
                 isFloatingOverHero
                   ? "text-white/80 hover:text-white"
                   : "text-muted-foreground hover:text-foreground dark:text-zinc-400 dark:hover:text-zinc-100"
               )}
             >
-              {c.nombre}
-            </Link>
-          ))}
+              Categorías
+              <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 group-data-popup-open:rotate-180" />
+            </MenuPrimitive.Trigger>
+            <MenuPrimitive.Portal>
+              <MenuPrimitive.Positioner
+                side="bottom"
+                align="start"
+                sideOffset={10}
+                className="isolate z-50"
+              >
+                <MenuPrimitive.Popup className="isolate z-50 min-w-56 origin-(--transform-origin) rounded-xl bg-popover p-1.5 text-popover-foreground shadow-lg ring-1 ring-foreground/10 duration-100 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2">
+                  {categorias.map((c) => (
+                    <MenuPrimitive.LinkItem
+                      key={c.id}
+                      closeOnClick
+                      render={<Link href={`/categoria/${c.slug}`} />}
+                      className="block cursor-pointer rounded-lg px-3 py-2 text-sm outline-none transition-colors data-highlighted:bg-muted"
+                    >
+                      {c.nombre}
+                    </MenuPrimitive.LinkItem>
+                  ))}
+                </MenuPrimitive.Popup>
+              </MenuPrimitive.Positioner>
+            </MenuPrimitive.Portal>
+          </MenuPrimitive.Root>
           <Link
             href="/productos"
             className={cn(
