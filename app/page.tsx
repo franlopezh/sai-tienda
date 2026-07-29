@@ -5,7 +5,11 @@ import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { Testimonios } from "@/components/testimonios";
 import { HeroCarousel, type HeroSlide } from "@/components/hero-carousel";
-import { getCategoriasConPreview, getProductosDestacados } from "@/lib/queries";
+import {
+  getCategoriasConPreview,
+  getProductosCarrusel,
+  getProductosDestacados,
+} from "@/lib/queries";
 import { calcularPlanDefault, getPrecioPublico } from "@/lib/credito";
 import { formatMXN } from "@/lib/format";
 import {
@@ -14,6 +18,11 @@ import {
   Truck,
   CalendarClock,
 } from "lucide-react";
+
+// La home se regenera (ISR) cada 5 min para reflejar cambios del admin —
+// sobre todo qué productos se marcan como destacados para el carrusel— sin
+// necesidad de un redeploy. Un deploy la actualiza al instante igualmente.
+export const revalidate = 300;
 
 const ICONO_FALLBACK: Record<string, string> = {
   motocicletas: "🏍️",
@@ -31,16 +40,15 @@ const PREVIEW_FALLBACK: Record<string, string> = {
 };
 
 export default async function Home() {
-  const [categorias, destacados] = await Promise.all([
+  const [categorias, carrusel, destacados] = await Promise.all([
     getCategoriasConPreview(),
+    getProductosCarrusel(4),
     getProductosDestacados(8),
   ]);
 
-  // Toma los primeros 4 destacados con imagen para los slides del hero.
-  const destacadosConImagen = destacados.filter((p) => p.imagen_url).slice(0, 4);
-
-  // Curated: si hay destacados, arma slides. Si no, deja al menos el slide genérico SAI.
-  const slidesProductos: HeroSlide[] = destacadosConImagen.map((p, idx) => {
+  // Slides del hero: los productos que el admin marcó como destacados
+  // (`productos.destacado`). Con fallback interno si no hay ninguno marcado.
+  const slidesProductos: HeroSlide[] = carrusel.map((p, idx) => {
     const plan = calcularPlanDefault(getPrecioPublico(p));
     const desde = plan?.pagoDiario ?? p.pago_diario ?? 0;
     // Gradientes más oscuros para integrar mejor con bg-background (dark)
@@ -83,8 +91,11 @@ export default async function Home() {
   const heroSlides: HeroSlide[] =
     slidesProductos.length > 0 ? slidesProductos : [slideSAI];
 
+  // "Más solicitados": destacados generales, excluyendo los que ya salen en el
+  // carrusel para no repetir producto.
+  const carruselIds = new Set(carrusel.map((p) => p.id));
   const restoDestacados = destacados
-    .filter((p) => !destacadosConImagen.some((d) => d.id === p.id))
+    .filter((p) => !carruselIds.has(p.id))
     .slice(0, 4);
 
   return (

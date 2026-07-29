@@ -30,6 +30,9 @@ export type Producto = {
    * cuando no hay unidades; motos/llantas nunca (se consulta al proveedor).
    * Incluye tambien los productos inactivos. */
   agotado?: boolean | null;
+  /** Marcado desde el admin para aparecer en el carrusel del hero (home).
+   * Vive en la tabla base `productos` (no en la vista productos_publicos). */
+  destacado?: boolean | null;
   activo?: boolean;
   pago_semanal?: number;
   pago_diario?: number;

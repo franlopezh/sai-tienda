@@ -93,6 +93,44 @@ export async function getProductosDestacados(
   return (data ?? []).map(mapProducto);
 }
 
+/**
+ * Productos que el admin marcó para el carrusel del hero (`productos.destacado`).
+ * Lee de la tabla base `productos` (no de la vista `productos_publicos`) porque
+ * la columna `destacado` vive ahí y el slide no necesita las columnas calculadas
+ * de la vista (agotado/disponibles).
+ *
+ * Degradación elegante: si la columna aún no se migró (la query falla) o no hay
+ * ningún producto marcado, cae al comportamiento anterior (primeros activos con
+ * imagen) para que el carrusel nunca quede vacío.
+ */
+export async function getProductosCarrusel(limit = 4): Promise<Producto[]> {
+  const { data, error } = await supabase
+    .from("productos")
+    .select(
+      "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at, destacado"
+    )
+    .eq("activo", true)
+    .eq("destacado", true)
+    .not("imagen_url", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    // Típicamente 42703 (columna inexistente) mientras la migración esté pendiente.
+    console.warn(
+      "getProductosCarrusel: usando fallback (¿columna 'destacado' sin migrar?):",
+      error.message
+    );
+  }
+
+  const destacadosManual = (data ?? []).map(mapProducto);
+  if (destacadosManual.length > 0) return destacadosManual;
+
+  // Fallback: primeros activos con imagen, como antes.
+  const generales = await getProductosDestacados(Math.max(limit * 2, 8));
+  return generales.filter((p) => p.imagen_url).slice(0, limit);
+}
+
 export type OrdenProductos =
   | "nombre"
   | "credito_asc"
@@ -363,6 +401,7 @@ function mapProducto(row: Record<string, unknown>): Producto {
     stock: typeof row.stock === "number" ? row.stock : null,
     disponibles: typeof row.disponibles === "number" ? row.disponibles : null,
     agotado: row.agotado === true,
+    destacado: row.destacado === true,
     activo: row.activo as boolean,
     pago_semanal: parseNum(row.pago_semanal),
     pago_diario: parseNum(row.pago_diario),
