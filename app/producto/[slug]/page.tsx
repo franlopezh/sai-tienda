@@ -288,7 +288,7 @@ export default async function ProductoPage({ params }: { params: Params }) {
             {!agotado && (
               <div className="mt-6 grid grid-cols-3 gap-3">
                 {[
-                  { Icon: ShieldCheck, label: "Sin checador" },
+                  { Icon: ShieldCheck, label: "No revisamos buró" },
                   { Icon: Clock4, label: "Aprobación 24h" },
                   { Icon: Truck, label: "Entrega a domicilio" },
                 ].map(({ Icon, label }) => (

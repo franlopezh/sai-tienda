@@ -64,8 +64,8 @@ export default async function Home() {
       title: p.nombre,
       subtitle:
         desde > 0
-          ? `Desde ${formatMXN(desde)} al día. Aprobación en 24h, sin checador.`
-          : "Aprobación en 24h, sin checador. Entrega a domicilio.",
+          ? `Desde ${formatMXN(desde)} al día. Aprobación en 24h. Entrega a domicilio.`
+          : "Aprobación en 24h. Entrega a domicilio.",
       ctaPrimary: { label: "Quiero financiarlo", href: `/producto/${p.slug}` },
       ctaSecondary: { label: "Más información", href: `/producto/${p.slug}` },
       image: p.imagen_url ?? undefined,
@@ -79,7 +79,7 @@ export default async function Home() {
     eyebrow: "FINANCIAMIENTO SAI",
     title: "Llévate hoy lo que necesitas, paga en semanas.",
     subtitle:
-      "Sin checador. Aprobación en 24 horas. Entrega a domicilio en toda la región.",
+      "Aprobación en 24 horas. Entrega a domicilio en toda la región.",
     ctaPrimary: {
       label: "Ver catálogo",
       href: categorias[0] ? `/categoria/${categorias[0].slug}` : "/productos",
@@ -110,8 +110,8 @@ export default async function Home() {
             {[
               {
                 Icon: ShieldCheck,
-                titulo: "Sin checador",
-                texto: "No revisamos buró.",
+                titulo: "No revisamos buró",
+                texto: "Tu historial no es obstáculo.",
               },
               {
                 Icon: Clock4,

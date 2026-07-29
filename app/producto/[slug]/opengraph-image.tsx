@@ -125,7 +125,7 @@ export default async function OpenGraphImage({
               fontWeight: 500,
             }}
           >
-            Sin checador · Aprobación 24h · Entrega a domicilio
+            No revisamos buró · Aprobación 24h · Entrega a domicilio
           </span>
         </div>
 

@@ -36,7 +36,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Market SAI — Todo lo que necesitas, con crédito SAI",
   description:
-    "Catálogo de motos, celulares y línea blanca con financiamiento SAI. Sin checador, aprobación en 24 horas.",
+    "Catálogo de motos, celulares y línea blanca con financiamiento SAI. Aprobación en 24 horas.",
 };
 
 export default function RootLayout({

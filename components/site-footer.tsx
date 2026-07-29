@@ -67,8 +67,8 @@ export function SiteFooter() {
           <div className="md:col-span-4">
             <PulseLogo />
             <p className="mt-4 max-w-xs text-sm text-muted-foreground">
-              Financiamos lo que necesitas, paga cómodo en semanas. Sin
-              checador, aprobación en 24h, entrega a domicilio.
+              Financiamos lo que necesitas, paga cómodo en semanas.
+              Aprobación en 24h, entrega a domicilio.
             </p>
             {/* Redes sociales con iconos */}
             <div className="mt-5 flex items-center gap-2">
