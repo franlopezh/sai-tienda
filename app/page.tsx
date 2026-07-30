@@ -42,7 +42,9 @@ const PREVIEW_FALLBACK: Record<string, string> = {
 export default async function Home() {
   const [categorias, carrusel, destacados] = await Promise.all([
     getCategoriasConPreview(),
-    getProductosCarrusel(4),
+    // Sin argumento: muestra TODOS los productos marcados en el admin. El 4 que
+    // recibe por defecto solo aplica al fallback de cuando no hay ninguno.
+    getProductosCarrusel(),
     getProductosDestacados(8),
   ]);
 

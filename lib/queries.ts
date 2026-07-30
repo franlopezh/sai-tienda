@@ -103,7 +103,17 @@ export async function getProductosDestacados(
  * ningún producto marcado, cae al comportamiento anterior (primeros activos con
  * imagen) para que el carrusel nunca quede vacío.
  */
-export async function getProductosCarrusel(limit = 4): Promise<Producto[]> {
+export async function getProductosCarrusel(
+  limiteFallback = 4
+): Promise<Producto[]> {
+  // SIN límite: el carrusel muestra todo lo que el admin marque. La curaduría
+  // vive en el admin (marcar/desmarcar), no en un número escrito aquí — antes
+  // con un tope de 4 los productos marcados de más no salían nunca y no había
+  // forma de notarlo desde la tienda.
+  //
+  // `publicado` no se filtra aquí a propósito: un trigger en la BD
+  // (productos_destacado_requiere_publicado) fuerza destacado=false en lo no
+  // publicado, así que una ficha de proveedor pendiente no puede llegar al hero.
   const { data, error } = await supabase
     .from("productos")
     .select(
@@ -112,8 +122,7 @@ export async function getProductosCarrusel(limit = 4): Promise<Producto[]> {
     .eq("activo", true)
     .eq("destacado", true)
     .not("imagen_url", "is", null)
-    .order("created_at", { ascending: false })
-    .limit(limit);
+    .order("created_at", { ascending: false });
 
   if (error) {
     // Típicamente 42703 (columna inexistente) mientras la migración esté pendiente.
@@ -126,9 +135,12 @@ export async function getProductosCarrusel(limit = 4): Promise<Producto[]> {
   const destacadosManual = (data ?? []).map(mapProducto);
   if (destacadosManual.length > 0) return destacadosManual;
 
-  // Fallback: primeros activos con imagen, como antes.
-  const generales = await getProductosDestacados(Math.max(limit * 2, 8));
-  return generales.filter((p) => p.imagen_url).slice(0, limit);
+  // Fallback (nadie marcado todavía): primeros activos con imagen, como antes.
+  // Aquí sí acotamos, porque no es una selección deliberada de nadie.
+  const generales = await getProductosDestacados(
+    Math.max(limiteFallback * 2, 8)
+  );
+  return generales.filter((p) => p.imagen_url).slice(0, limiteFallback);
 }
 
 export type OrdenProductos =
