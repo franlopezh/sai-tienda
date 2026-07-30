@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,18 +25,21 @@ import { formatMXN, buildWhatsAppLink } from "@/lib/format";
 import type { Producto } from "@/lib/types";
 import type { PlanCredito } from "@/lib/credito";
 
-const CIUDADES = [
-  "Tlaxcala",
-  "Puebla",
-  "Pachuca",
-  "Texcoco",
-  "Teotihuacán",
-  "Tulancingo",
-  "Otumba",
+// Fallback por si falla la lectura de ejecutivos_publicos. La lista real se
+// carga desde la BD (misma tabla que el ruteo por WhatsApp), así el menú y la
+// asignación nunca se desincronizan. "Otra" se agrega aparte como comodín.
+const CIUDADES_FALLBACK = [
+  "Acolman",
+  "Actopan",
   "Calpulalpan",
+  "Otumba",
+  "Pachuca",
   "Sahagún",
+  "San Martín",
+  "Teotihuacán",
   "Texmelucan",
-  "Otra",
+  "Tlaxcala",
+  "Tulancingo",
 ];
 
 type Props = {
@@ -64,6 +67,30 @@ export function LeadModal({
   const [acepto, setAcepto] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [ciudades, setCiudades] = useState<string[]>(CIUDADES_FALLBACK);
+
+  // Carga las ciudades desde ejecutivos_publicos al abrir el modal. Fuente única
+  // con el ruteo: si una ciudad aparece en el menú, es porque tiene ejecutivo.
+  useEffect(() => {
+    if (!open) return;
+    let cancelado = false;
+    supabase
+      .from("ejecutivos_publicos")
+      .select("ciudad")
+      .eq("activo", true)
+      .not("ciudad", "is", null)
+      .then(({ data, error: err }) => {
+        if (cancelado || err || !data?.length) return;
+        const set = new Set<string>();
+        (data as { ciudad: string | null }[]).forEach((r) => {
+          if (r.ciudad) set.add(r.ciudad.trim());
+        });
+        setCiudades([...set].sort((a, b) => a.localeCompare(b, "es")));
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, [open]);
 
   function reset() {
     setNombre("");
@@ -263,7 +290,7 @@ export function LeadModal({
                 <SelectValue placeholder="Selecciona..." />
               </SelectTrigger>
               <SelectContent>
-                {CIUDADES.map((c) => (
+                {[...ciudades, "Otra"].map((c) => (
                   <SelectItem key={c} value={c}>
                     {c}
                   </SelectItem>
