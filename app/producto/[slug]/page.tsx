@@ -8,7 +8,7 @@ import { ProductGallery } from "@/components/product-gallery";
 import { ShareButton } from "@/components/share-button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, Clock4, Truck, ChevronRight, Wrench, Palette, MapPin } from "lucide-react";
+import { ShieldCheck, Clock4, Truck, ChevronRight, Wrench, Palette, Info } from "lucide-react";
 import { formatMXN } from "@/lib/format";
 import {
   getProductoBySlug,
@@ -275,14 +275,11 @@ export default async function ProductoPage({ params }: { params: Params }) {
               )}
             </div>
 
-            {/* Aviso legal: precio y stock dependen de la sucursal/zona */}
-            <p className="mt-4 flex items-start gap-1.5 text-[11px] leading-relaxed text-muted-foreground">
-              <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-              <span>
-                La disponibilidad y el precio pueden variar según la zona. Tu
-                ejecutivo te confirma el precio final y las unidades disponibles
-                para tu ciudad.
-              </span>
+            {/* Aviso legal. Caja con tono ámbar (no el azul de marca) para que
+                destaque sobre el fondo de la ficha y no se lea como decoración. */}
+            <p className="mt-5 flex items-center gap-2 rounded-lg border border-amber-300/70 bg-amber-50 px-3 py-2.5 text-sm font-semibold text-amber-900 dark:border-amber-500/40 dark:bg-amber-950/40 dark:text-amber-200">
+              <Info className="h-4 w-4 shrink-0" />
+              Precios y plazos sujetos a cambios.
             </p>
 
             {!agotado && (
