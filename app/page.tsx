@@ -107,7 +107,9 @@ export default async function Home() {
       <main className="flex-1">
         <HeroCarousel slides={heroSlides} />
 
-        <section className="relative z-20 mx-auto -mt-16 max-w-6xl px-4 md:-mt-20 md:px-6">
+        {/* La barra se superpone al carrusel, pero poco: con el marco blanco
+            del hero un traslape grande hacía que se tocaran los bordes. */}
+        <section className="relative z-20 mx-auto -mt-6 max-w-6xl px-4 md:-mt-8 md:px-6">
           <div className="grid gap-4 rounded-2xl border bg-card/95 p-4 shadow-xl backdrop-blur-md md:grid-cols-4 md:p-6">
             {[
               {

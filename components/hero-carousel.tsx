@@ -110,12 +110,18 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
                   </div>
                   {slide.image && (
                     <div className="order-1 flex items-center justify-center pt-28 md:order-2 md:h-full md:pb-48 md:pt-32">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={slide.image}
-                        alt={slide.imageAlt ?? slide.title}
-                        className="max-h-60 w-auto object-contain drop-shadow-2xl md:max-h-[28rem] lg:max-h-[32rem]"
-                      />
+                      {/* Marco blanco redondeado: encuadra la foto como una ficha
+                          del carrusel en vez de una imagen pegada al degradado.
+                          De paso uniforma el tamaño — el cuadrado fijo + contain
+                          da la misma presencia a fotos de cualquier proporción. */}
+                      <div className="flex aspect-square h-64 items-center justify-center overflow-hidden rounded-3xl bg-white p-2 shadow-2xl ring-1 ring-black/5 md:h-[19rem] md:p-2.5 lg:h-[26rem] xl:h-[30rem]">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={slide.image}
+                          alt={slide.imageAlt ?? slide.title}
+                          className="h-full w-full object-contain"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
@@ -138,8 +144,9 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
               <p className="mt-3 text-sm md:mt-4 md:text-lg">subtitle</p>
               <div className="mt-5 h-12 md:mt-7" />
             </div>
-            {/* Imagen (placeholder de altura) */}
-            <div className="order-1 h-60 pt-28 md:order-2 md:h-[28rem] md:pt-32 lg:h-[32rem]" />
+            {/* Imagen (placeholder de altura) — debe seguir al marco blanco de
+                arriba: como es aspect-square, su alto = su ancho tope. */}
+            <div className="order-1 h-64 pt-28 md:order-2 md:h-[19rem] md:pt-32 lg:h-[26rem] xl:h-[30rem]" />
           </div>
         </div>
 
