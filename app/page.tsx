@@ -154,7 +154,10 @@ export default async function Home() {
             {categorias.map((c) => (
               <Link key={c.id} href={`/categoria/${c.slug}`} className="block h-full">
                 <Card className="flex h-full flex-col overflow-hidden transition hover:shadow-md hover:border-border">
-                  <div className="relative h-40 w-full shrink-0 overflow-hidden flex items-center justify-center p-4">
+                  {/* bg-white tambien en dark: las fotos traen fondo blanco
+                      horneado, y sobre un card oscuro se marcarian como un
+                      recuadro. Mismo patron que product-card.tsx. */}
+                  <div className="relative h-40 w-full shrink-0 overflow-hidden flex items-center justify-center bg-white p-4">
                     {(() => {
                       const preview =
                         c.preview_imagen ?? PREVIEW_FALLBACK[c.slug ?? ""];

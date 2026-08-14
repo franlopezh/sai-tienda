@@ -219,7 +219,7 @@ export function LeadModal({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-3 rounded-lg border bg-muted/50 p-3 dark:bg-zinc-900/40">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md bg-card">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white">
               {producto.imagen_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
