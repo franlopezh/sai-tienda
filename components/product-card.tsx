@@ -79,7 +79,7 @@ export function ProductCard({
               alt={producto.nombre}
               loading="lazy"
               className={cn(
-                "absolute inset-0 h-full w-full object-contain p-8 transition-transform duration-500 ease-out group-hover:-translate-y-2",
+                "absolute inset-0 h-full w-full object-contain p-4 transition-transform duration-500 ease-out group-hover:-translate-y-2 md:p-8",
                 agotado && "opacity-60 grayscale"
               )}
             />
@@ -91,7 +91,7 @@ export function ProductCard({
         </div>
 
         {/* Info — centrada, editorial */}
-        <div className="flex flex-1 flex-col items-center gap-2 px-5 pb-5 pt-3 text-center">
+        <div className="flex flex-1 flex-col items-center gap-2 px-3 pb-4 pt-3 text-center md:px-5 md:pb-5">
           {producto.marca && (
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               {producto.marca.trim()}
@@ -124,16 +124,16 @@ export function ProductCard({
 
           {/* Tags/pills con plazo y enganche */}
           {(plazoMeses || enganche > 0) && (
-            <div className="mt-1 flex items-center justify-center gap-1.5">
+            <div className="mt-1 flex flex-wrap items-center justify-center gap-1.5">
               {plazoMeses && (
-                <span className="rounded-full bg-muted px-2 py-0.5 font-mono text-[10px] font-medium tabular-nums text-muted-foreground">
+                <span className="whitespace-nowrap rounded-full bg-muted px-2 py-0.5 font-mono text-[10px] font-medium tabular-nums text-muted-foreground">
                   {Number.isInteger(plazoMeses)
                     ? `${plazoMeses} m`
                     : `${plazoMeses} m`}
                 </span>
               )}
               {enganche > 0 && (
-                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                <span className="whitespace-nowrap rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                   <span className="font-sans">Eng. </span>
                   <span className="font-mono tabular-nums">{formatMXN(enganche)}</span>
                 </span>
@@ -141,9 +141,10 @@ export function ProductCard({
             </div>
           )}
 
-          {/* CTA que aparece on hover (oculto si agotado) */}
+          {/* CTA que aparece on hover (oculto si agotado). Solo md+: en touch
+              no hay hover y dejaba un hueco vacío al pie de cada tarjeta. */}
           {!agotado && (
-            <div className="mt-3 flex w-full items-center justify-center gap-1 rounded-full bg-blue-700 px-4 py-2 text-xs font-semibold text-white opacity-0 transition-all duration-300 group-hover:opacity-100 dark:bg-blue-600">
+            <div className="mt-3 hidden w-full items-center justify-center gap-1 rounded-full bg-blue-700 px-4 py-2 text-xs font-semibold text-white opacity-0 transition-all duration-300 group-hover:opacity-100 md:flex dark:bg-blue-600">
               Financiar
               <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
             </div>

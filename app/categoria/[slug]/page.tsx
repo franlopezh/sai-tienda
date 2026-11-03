@@ -4,7 +4,7 @@ import { PackageX, PackageOpen } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
-import { CategoriaFiltros } from "@/components/categoria-filtros";
+import { FiltrosProductos } from "@/components/filtros-productos";
 import { EmptyState } from "@/components/empty-state";
 import {
   getCategoriaBySlug,
@@ -15,6 +15,7 @@ import {
 
 type Params = Promise<{ slug: string }>;
 type Search = Promise<{
+  q?: string;
   marca?: string;
   semanalMin?: string;
   semanalMax?: string;
@@ -47,10 +48,11 @@ export default async function CategoriaPage({
     : "nombre";
   const semanalMin = sp.semanalMin ? Number(sp.semanalMin) : undefined;
   const semanalMax = sp.semanalMax ? Number(sp.semanalMax) : undefined;
-  const hayFiltros = !!(sp.marca || sp.semanalMin || sp.semanalMax);
+  const hayFiltros = !!(sp.q || sp.marca || sp.semanalMin || sp.semanalMax);
 
   const [productos, marcas] = await Promise.all([
     getProductosPorCategoria(categoria.id, {
+      q: sp.q,
       marca: sp.marca,
       semanalMin: Number.isFinite(semanalMin) ? semanalMin : undefined,
       semanalMax: Number.isFinite(semanalMax) ? semanalMax : undefined,
@@ -62,23 +64,27 @@ export default async function CategoriaPage({
   return (
     <div className="flex flex-col flex-1">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-12">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:py-12">
         <nav className="text-sm text-muted-foreground">
           <Link href="/">Inicio</Link> › <span>{categoria.nombre}</span>
         </nav>
 
-        <div className="mt-4 flex items-baseline justify-between">
-          <h1 className="text-3xl font-semibold">{categoria.nombre}</h1>
+        {/* flex-wrap: con nombres largos ("Celulares/Tecnología") el
+            contador se salía de la pantalla en celular. */}
+        <div className="mt-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <h1 className="text-2xl font-semibold md:text-3xl">{categoria.nombre}</h1>
           <span className="text-sm text-muted-foreground">
             {productos.length} producto{productos.length === 1 ? "" : "s"}
           </span>
         </div>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-[16rem_1fr] md:items-start">
-          <CategoriaFiltros marcas={marcas} />
+        <div className="mt-6">
+          <FiltrosProductos marcas={marcas} />
+        </div>
 
+        <div className="mt-6">
           {productos.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
               {productos.map((p, idx) => (
                 <ProductCard key={p.id} producto={p} index={idx} />
               ))}
@@ -87,7 +93,7 @@ export default async function CategoriaPage({
             <EmptyState
               icon={PackageX}
               title="Sin productos con esos filtros"
-              description="Prueba con otra marca o ajusta el rango de pago semanal. También puedes ver el catálogo completo."
+              description="Prueba con otra búsqueda, otra marca o ajusta el rango de pago semanal. También puedes ver el catálogo completo."
               primaryAction={{
                 label: "Limpiar filtros",
                 href: `/categoria/${categoria.slug}`,

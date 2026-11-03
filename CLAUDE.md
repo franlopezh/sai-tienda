@@ -47,9 +47,8 @@ components/
   site-footer.tsx               Footer con sucursales + enlaces + redes
   product-card.tsx              Card uniforme: h-44 mobile / h-52 desktop, max-h/w object-contain
   lead-modal.tsx                Modal financiamiento: form + INSERT solicitudes_compra + round-robin + WhatsApp
-  categoria-filtros.tsx         Sidebar sticky filtros (orden, marca, pago semanal min/max)
-  todos-productos-filtros.tsx   Variante con filtro de categoría
-  search-input.tsx              Input header → /buscar
+  filtros-productos.tsx         Barra de filtros de listados (texto, orden, categoría, marca, pago semanal); plegable en celular
+  search-input.tsx              Input header → /buscar (en celular se abre con la lupa del header)
   scroll-to-top.tsx             Cliente que fuerza scroll al top en cada navegación
   whatsapp-fab.tsx              Botón flotante WhatsApp esquina inferior derecha
   testimonios.tsx               3 cards placeholder Unsplash
@@ -62,6 +61,7 @@ lib/
   queries.ts                    Todas las queries: getCategorias, getProductosPorCategoria, buscarProductos, etc.
   types.ts                      Producto, Categoria
   format.ts                     formatMXN, buildWhatsAppLink
+  promo.ts                      Promo temporal por fechas (0% enganche 4–7 nov 2026); se prende/apaga sola
   utils.ts                      cn (Tailwind class merger)
 ```
 

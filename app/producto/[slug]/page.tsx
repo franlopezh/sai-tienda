@@ -123,7 +123,7 @@ export default async function ProductoPage({ params }: { params: Params }) {
   return (
     <div className="flex flex-col flex-1">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-12">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:py-12">
         {/* Breadcrumb con categoría */}
         <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
           <Link href="/" className="hover:text-foreground transition-colors">
@@ -144,85 +144,16 @@ export default async function ProductoPage({ params }: { params: Params }) {
           <span className="truncate text-foreground/80">{producto.nombre}</span>
         </nav>
 
-        <div className="mt-6 grid gap-8 md:grid-cols-2 md:items-start">
-          {/* Galería interactiva + especificaciones debajo */}
+        {/* Orden en celular: galería → info/simulador → specs (antes las specs
+            salían antes del nombre y el precio). En md+ la info ocupa la
+            columna derecha a todo lo alto y las specs quedan bajo la galería. */}
+        <div className="mt-6 grid gap-x-8 gap-y-6 md:grid-cols-2 md:grid-rows-[auto_1fr] md:items-start">
           <div className="mx-auto w-full max-w-md md:mx-0">
             <ProductGallery imagenes={galeria} nombre={producto.nombre} />
-
-            {/* Especificaciones técnicas — compactas, justo bajo la imagen.
-                Animación con delay para que aparezca después de la galería
-                y llame la atención sin opacar al producto. */}
-            {descripcionParsed && descripcionParsed.specs.length > 0 && (
-              <section
-                className="mt-5 animate-in fade-in-0 slide-in-from-bottom-4 fill-mode-both"
-                style={{ animationDuration: "700ms", animationDelay: "400ms" }}
-              >
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                    <Wrench className="h-3.5 w-3.5" />
-                  </span>
-                  <h2 className="text-sm font-semibold tracking-tight text-foreground">
-                    Especificaciones técnicas
-                  </h2>
-                </div>
-                <div className="overflow-hidden rounded-lg border border-blue-200/60 bg-gradient-to-br from-blue-50/60 to-transparent shadow-sm dark:border-blue-900/40 dark:from-blue-950/30 dark:to-transparent">
-                  <dl className="divide-y divide-blue-200/40 dark:divide-blue-900/30">
-                    {descripcionParsed.specs.map((s, idx) => (
-                      <div
-                        key={s.key + idx}
-                        className={`grid grid-cols-[45%_55%] transition-colors ${
-                          idx % 2 === 0
-                            ? "bg-blue-50/40 dark:bg-blue-950/30"
-                            : "bg-transparent"
-                        }`}
-                      >
-                        <dt className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-blue-700/80 dark:text-blue-300/80">
-                          {s.key}
-                        </dt>
-                        <dd className="px-3 py-2 text-xs font-medium text-foreground">
-                          {s.value}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              </section>
-            )}
-
-            {/* Colores disponibles — derivados del inventario en stock */}
-            {colores.length > 0 && (
-              <section
-                className="mt-5 animate-in fade-in-0 slide-in-from-bottom-4 fill-mode-both"
-                style={{ animationDuration: "700ms", animationDelay: "500ms" }}
-              >
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                    <Palette className="h-3.5 w-3.5" />
-                  </span>
-                  <h2 className="text-sm font-semibold tracking-tight text-foreground">
-                    Colores disponibles
-                  </h2>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {colores.map((c) => (
-                    <span
-                      key={c}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/60 px-2.5 py-1 text-xs font-medium text-foreground"
-                    >
-                      <span
-                        className="h-3 w-3 shrink-0 rounded-full border border-black/10 shadow-sm dark:border-white/20"
-                        style={{ backgroundColor: swatchColor(c) }}
-                      />
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              </section>
-            )}
           </div>
 
           {/* Info del producto */}
-          <div>
+          <div className="md:row-span-2">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 {producto.marca && (
@@ -313,6 +244,83 @@ export default async function ProductoPage({ params }: { params: Params }) {
               </div>
             )}
           </div>
+
+          {/* Specs y colores: bajo la galería en md+, al final en celular. */}
+          {((descripcionParsed && descripcionParsed.specs.length > 0) ||
+            colores.length > 0) && (
+            <div className="mx-auto w-full max-w-md space-y-5 md:mx-0">
+              {/* Especificaciones técnicas — compactas, justo bajo la imagen.
+                  Animación con delay para que aparezca después de la galería
+                  y llame la atención sin opacar al producto. */}
+              {descripcionParsed && descripcionParsed.specs.length > 0 && (
+                <section
+                  className="animate-in fade-in-0 slide-in-from-bottom-4 fill-mode-both"
+                  style={{ animationDuration: "700ms", animationDelay: "400ms" }}
+                >
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                      <Wrench className="h-3.5 w-3.5" />
+                    </span>
+                    <h2 className="text-sm font-semibold tracking-tight text-foreground">
+                      Especificaciones técnicas
+                    </h2>
+                  </div>
+                  <div className="overflow-hidden rounded-lg border border-blue-200/60 bg-gradient-to-br from-blue-50/60 to-transparent shadow-sm dark:border-blue-900/40 dark:from-blue-950/30 dark:to-transparent">
+                    <dl className="divide-y divide-blue-200/40 dark:divide-blue-900/30">
+                      {descripcionParsed.specs.map((s, idx) => (
+                        <div
+                          key={s.key + idx}
+                          className={`grid grid-cols-[45%_55%] transition-colors ${
+                            idx % 2 === 0
+                              ? "bg-blue-50/40 dark:bg-blue-950/30"
+                              : "bg-transparent"
+                          }`}
+                        >
+                          <dt className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-blue-700/80 dark:text-blue-300/80">
+                            {s.key}
+                          </dt>
+                          <dd className="px-3 py-2 text-xs font-medium text-foreground">
+                            {s.value}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                </section>
+              )}
+
+              {/* Colores disponibles — derivados del inventario en stock */}
+              {colores.length > 0 && (
+                <section
+                  className="animate-in fade-in-0 slide-in-from-bottom-4 fill-mode-both"
+                  style={{ animationDuration: "700ms", animationDelay: "500ms" }}
+                >
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                      <Palette className="h-3.5 w-3.5" />
+                    </span>
+                    <h2 className="text-sm font-semibold tracking-tight text-foreground">
+                      Colores disponibles
+                    </h2>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {colores.map((c) => (
+                      <span
+                        key={c}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/60 px-2.5 py-1 text-xs font-medium text-foreground"
+                      >
+                        <span
+                          className="h-3 w-3 shrink-0 rounded-full border border-black/10 shadow-sm dark:border-white/20"
+                          style={{ backgroundColor: swatchColor(c) }}
+                        />
+                        {c}
+                      </span>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Descripción libre (lo que no es spec) */}

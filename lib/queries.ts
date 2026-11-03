@@ -151,6 +151,8 @@ export type OrdenProductos =
   | "semanal_desc";
 
 export type FiltrosCategoria = {
+  /** Texto libre: busca en nombre, marca y modelo. */
+  q?: string;
   marca?: string;
   semanalMin?: number;
   semanalMax?: number;
@@ -168,7 +170,9 @@ export async function getProductosPorCategoria(
     )
     .eq("categoria_id", categoriaId);
 
-  if (filtros.marca) query = query.eq("marca", filtros.marca);
+  if (filtros.marca) query = query.ilike("marca", filtroMarca(filtros.marca));
+  const texto = filtroTexto(filtros.q);
+  if (texto) query = query.or(texto);
 
   // Siempre activos primero, agotados al final (independiente del orden secundario).
   query = query.order("agotado", { ascending: true });
@@ -223,7 +227,9 @@ export async function getTodosLosProductos(
     );
 
   if (filtros.categoriaId) query = query.eq("categoria_id", filtros.categoriaId);
-  if (filtros.marca) query = query.eq("marca", filtros.marca);
+  if (filtros.marca) query = query.ilike("marca", filtroMarca(filtros.marca));
+  const texto = filtroTexto(filtros.q);
+  if (texto) query = query.or(texto);
 
   // Activos primero, agotados al final.
   query = query.order("agotado", { ascending: true });
@@ -261,20 +267,46 @@ export async function getTodosLosProductos(
   return productos;
 }
 
+/** Marcas activas de una categoría, o de todo el catálogo sin categoría. */
 export async function getMarcasPorCategoria(
-  categoriaId: string
+  categoriaId?: string
 ): Promise<string[]> {
-  const { data, error } = await supabase
+  let query = supabase
     .from("productos_publicos")
     .select("marca")
-    .eq("categoria_id", categoriaId)
     .eq("activo", true);
+  if (categoriaId) query = query.eq("categoria_id", categoriaId);
+  const { data, error } = await query;
   if (error) return [];
-  const set = new Set<string>();
-  (data ?? []).forEach((r: { marca: string | null }) => {
-    if (r.marca) set.add(r.marca.trim());
-  });
-  return Array.from(set).sort();
+  return unificarMarcas(
+    (data ?? []).map((r: { marca: string | null }) => r.marca)
+  );
+}
+
+/**
+ * Marcas para los filtros sin duplicados por mayúsculas o espacios: en la BD
+ * conviven "SAMSUNG", "Samsung" y "XIAOMI ". Una entrada por marca, de
+ * preferencia la variante que no va toda en mayúsculas.
+ */
+export function unificarMarcas(marcas: (string | null | undefined)[]): string[] {
+  const porClave = new Map<string, string>();
+  for (const m of marcas) {
+    const limpia = m?.trim();
+    if (!limpia) continue;
+    const clave = limpia.toLowerCase();
+    const actual = porClave.get(clave);
+    const actualMayus = actual !== undefined && actual === actual.toUpperCase();
+    if (!actual || (actualMayus && limpia !== limpia.toUpperCase())) {
+      porClave.set(clave, limpia);
+    }
+  }
+  return [...porClave.values()].sort((a, b) => a.localeCompare(b, "es"));
+}
+
+// El filtro por marca no distingue mayúsculas y tolera espacios al final
+// (ver unificarMarcas): "Samsung" encuentra también "SAMSUNG" y "Samsung ".
+function filtroMarca(marca: string): string {
+  return `${marca.trim()}%`;
 }
 
 export async function getCategoriaById(id: string): Promise<Categoria | null> {
@@ -314,17 +346,14 @@ export async function getProductosRelacionados(
 }
 
 export async function buscarProductos(termino: string): Promise<Producto[]> {
-  const t = termino.trim();
-  if (!t) return [];
-  const ilike = `%${t}%`;
+  const texto = filtroTexto(termino);
+  if (!texto) return [];
   const { data, error } = await supabase
     .from("productos_publicos")
     .select(
       "id, nombre, slug, descripcion, categoria_id, precio_contado, precio_credito, imagen_url, imagenes, marca, modelo, ficha_tecnica_url, stock, activo, pago_semanal, pago_diario, enganche, created_at, agotado, disponibles"
     )
-    .or(
-      `nombre.ilike.${ilike},marca.ilike.${ilike},modelo.ilike.${ilike}`
-    )
+    .or(texto)
     .order("agotado", { ascending: true })
     .order("nombre", { ascending: true })
     .limit(60);
@@ -420,6 +449,18 @@ function mapProducto(row: Record<string, unknown>): Producto {
     enganche: parseNum(row.enganche),
     created_at: (row.created_at as string) ?? undefined,
   };
+}
+
+/**
+ * Filtro `or` de PostgREST para buscar texto en nombre, marca y modelo.
+ * Comas, paréntesis y comillas romperían la sintaxis del filtro, y % / * son
+ * comodines: se cambian por espacios. Null si no queda nada que buscar.
+ */
+function filtroTexto(termino?: string): string | null {
+  const t = (termino ?? "").replace(/[,()"\\%*]/g, " ").trim();
+  if (!t) return null;
+  const ilike = `%${t}%`;
+  return `nombre.ilike.${ilike},marca.ilike.${ilike},modelo.ilike.${ilike}`;
 }
 
 function parseNum(v: unknown): number {

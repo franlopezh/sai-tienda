@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu as MenuPrimitive } from "@base-ui/react/menu";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, Search, X } from "lucide-react";
 import { SearchInput } from "@/components/search-input";
 import { PulseLogo } from "@/components/pulse-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -23,6 +23,8 @@ type Props = {
 export function SiteHeaderClient({ categorias, overlay = false }: Props) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  // Buscador en celular: en el header no cabe, se despliega en su propia fila.
+  const [buscarOpen, setBuscarOpen] = useState(false);
 
   useEffect(() => {
     if (!overlay) return;
@@ -36,6 +38,7 @@ export function SiteHeaderClient({ categorias, overlay = false }: Props) {
   useEffect(() => {
     const close = () => {
       if (window.innerWidth >= 1024) setMenuOpen(false);
+      if (window.innerWidth >= 768) setBuscarOpen(false);
     };
     window.addEventListener("resize", close);
     return () => window.removeEventListener("resize", close);
@@ -63,7 +66,10 @@ export function SiteHeaderClient({ categorias, overlay = false }: Props) {
         {/* Hamburger button — solo mobile/tablet, antes del logo */}
         <button
           type="button"
-          onClick={() => setMenuOpen((o) => !o)}
+          onClick={() => {
+            setMenuOpen((o) => !o);
+            setBuscarOpen(false);
+          }}
           aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
           aria-expanded={menuOpen}
           className={cn(
@@ -141,8 +147,43 @@ export function SiteHeaderClient({ categorias, overlay = false }: Props) {
             Todos
           </Link>
         </nav>
+        <button
+          type="button"
+          onClick={() => {
+            setBuscarOpen((o) => !o);
+            setMenuOpen(false);
+          }}
+          aria-label={buscarOpen ? "Cerrar buscador" : "Buscar productos"}
+          aria-expanded={buscarOpen}
+          className={cn(
+            "ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors md:hidden",
+            isFloatingOverHero
+              ? "text-white hover:bg-white/10"
+              : "text-foreground hover:bg-muted"
+          )}
+        >
+          {buscarOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+        </button>
         <ThemeToggle />
       </div>
+
+      {buscarOpen && (
+        <div
+          className={cn(
+            "px-4 pb-3 md:hidden",
+            isFloatingOverHero && "bg-blue-950/60 pt-3 backdrop-blur-lg"
+          )}
+        >
+          <Suspense fallback={null}>
+            <SearchInput
+              autoFocus
+              className="flex w-full"
+              inputClassName="bg-background dark:bg-background"
+              onBuscar={() => setBuscarOpen(false)}
+            />
+          </Suspense>
+        </div>
+      )}
 
       {/* Dropdown mobile con categorías — hereda el estilo del header
           (semitransparente azul sobre carrusel para garantizar contraste con

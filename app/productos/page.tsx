@@ -3,15 +3,17 @@ import { PackageX } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
-import { TodosProductosFiltros } from "@/components/todos-productos-filtros";
+import { FiltrosProductos } from "@/components/filtros-productos";
 import { EmptyState } from "@/components/empty-state";
 import {
   getCategorias,
   getTodosLosProductos,
+  getMarcasPorCategoria,
   type OrdenProductos,
 } from "@/lib/queries";
 
 type Search = Promise<{
+  q?: string;
   categoria?: string;
   marca?: string;
   semanalMin?: string;
@@ -43,41 +45,45 @@ export default async function TodosProductosPage({
   const semanalMin = sp.semanalMin ? Number(sp.semanalMin) : undefined;
   const semanalMax = sp.semanalMax ? Number(sp.semanalMax) : undefined;
 
-  const [categorias, productos] = await Promise.all([
+  // Las marcas salen de la categoría elegida (o de todo el catálogo), no de
+  // los productos ya filtrados: si no, al elegir una marca el select se
+  // quedaba con una sola opción y desaparecía.
+  const [categorias, productos, marcas] = await Promise.all([
     getCategorias(),
     getTodosLosProductos({
+      q: sp.q,
       categoriaId: sp.categoria,
       marca: sp.marca,
       semanalMin: Number.isFinite(semanalMin) ? semanalMin : undefined,
       semanalMax: Number.isFinite(semanalMax) ? semanalMax : undefined,
       orden,
     }),
+    getMarcasPorCategoria(sp.categoria),
   ]);
 
-  const marcas = Array.from(
-    new Set(productos.map((p) => p.marca?.trim()).filter((m): m is string => !!m))
-  ).sort();
 
   return (
     <div className="flex flex-col flex-1">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-12">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:py-12">
         <nav className="text-sm text-muted-foreground">
           <Link href="/">Inicio</Link> › <span>Todos los productos</span>
         </nav>
 
-        <div className="mt-4 flex items-baseline justify-between">
-          <h1 className="text-3xl font-semibold">Todos los productos</h1>
+        <div className="mt-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <h1 className="text-2xl font-semibold md:text-3xl">Todos los productos</h1>
           <span className="text-sm text-muted-foreground">
             {productos.length} resultado{productos.length === 1 ? "" : "s"}
           </span>
         </div>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-[16rem_1fr] md:items-start">
-          <TodosProductosFiltros categorias={categorias} marcas={marcas} />
+        <div className="mt-6">
+          <FiltrosProductos categorias={categorias} marcas={marcas} />
+        </div>
 
+        <div className="mt-6">
           {productos.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
               {productos.map((p, idx) => (
                 <ProductCard key={p.id} producto={p} index={idx} />
               ))}
