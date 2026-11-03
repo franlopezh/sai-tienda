@@ -35,7 +35,7 @@ export function PromoSinEnganche({
           <p className="mt-3 max-w-md text-base text-blue-100">
             {activa
               ? `Solo ${p.fechas}, ${p.descripcionArticulos} se van sin enganche. Financias el 100% y pagas en semanas.`
-              : `${fechas}, ${p.descripcionArticulos} se van sin enganche. Ve eligiendo el tuyo.`}
+              : `${fechas}, ${p.descripcionArticulos} se van sin enganche. Encuentra todo lo que necesitas.`}
           </p>
           <Link
             href="/sin-enganche"

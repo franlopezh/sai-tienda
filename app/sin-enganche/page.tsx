@@ -75,7 +75,7 @@ export default async function SinEnganchePage() {
               <p className="mt-2 max-w-2xl text-sm text-blue-100 md:text-base">
                 {fase === "activa"
                   ? `Solo ${p.fechas}, ${p.descripcionArticulos} se van sin enganche: financias el 100% y pagas en semanas.`
-                  : `${p.fechas.charAt(0).toUpperCase()}${p.fechas.slice(1)}, ${p.descripcionArticulos} se van sin enganche. Ve eligiendo el tuyo.`}
+                  : `${p.fechas.charAt(0).toUpperCase()}${p.fechas.slice(1)}, ${p.descripcionArticulos} se van sin enganche. Encuentra todo lo que necesitas.`}
               </p>
               <p className="mt-4 flex max-w-2xl gap-2 rounded-lg bg-white/10 px-3 py-2.5 text-xs leading-relaxed text-blue-100 ring-1 ring-white/15">
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
