@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { Testimonios } from "@/components/testimonios";
 import { HeroCarousel, type HeroSlide } from "@/components/hero-carousel";
+import { PromoSinEnganche } from "@/components/promo-sin-enganche";
 import {
   getCategoriasConPreview,
   getProductosCarrusel,
@@ -12,6 +13,8 @@ import {
 } from "@/lib/queries";
 import { calcularPlanDefault, getPrecioPublico } from "@/lib/credito";
 import { formatMXN } from "@/lib/format";
+import { getFasePromo, PROMO_SIN_ENGANCHE } from "@/lib/promo";
+import { cn } from "@/lib/utils";
 import {
   ShieldCheck,
   Clock4,
@@ -22,6 +25,7 @@ import {
 // La home se regenera (ISR) cada 5 min para reflejar cambios del admin —
 // sobre todo qué productos se marcan como destacados para el carrusel— sin
 // necesidad de un redeploy. Un deploy la actualiza al instante igualmente.
+// También es lo que prende y apaga sola la promo de lib/promo.ts.
 export const revalidate = 300;
 
 const ICONO_FALLBACK: Record<string, string> = {
@@ -48,11 +52,18 @@ export default async function Home() {
     getProductosDestacados(8),
   ]);
 
+  // Promo 0% de enganche (lib/promo.ts): el banner con flyer + video sale
+  // desde el anuncio; los planes sin enganche solo mientras está activa.
+  const fasePromo = getFasePromo();
+  const mostrarPromo = fasePromo === "anuncio" || fasePromo === "activa";
+  const promoActiva = fasePromo === "activa";
+
   // Slides del hero: los productos que el admin marcó como destacados
   // (`productos.destacado`). Con fallback interno si no hay ninguno marcado.
   const slidesProductos: HeroSlide[] = carrusel.map((p, idx) => {
-    const plan = calcularPlanDefault(getPrecioPublico(p));
+    const plan = calcularPlanDefault(getPrecioPublico(p), promoActiva);
     const desde = plan?.pagoDiario ?? p.pago_diario ?? 0;
+    const sinEnganche = plan?.sinEnganche === true;
     // Gradientes más oscuros para integrar mejor con bg-background (dark)
     // y que el fade arriba/abajo del carrusel se vea natural.
     const gradients = [
@@ -63,10 +74,13 @@ export default async function Home() {
     ];
     return {
       eyebrow: p.marca?.toUpperCase() ?? "DESTACADO",
+      badge: sinEnganche ? "0% de enganche" : undefined,
       title: p.nombre,
       subtitle:
         desde > 0
-          ? `Desde ${formatMXN(desde)} al día. Aprobación en 24h. Entrega a domicilio.`
+          ? sinEnganche
+            ? `Sin enganche: desde ${formatMXN(desde)} al día. Aprobación en 24h.`
+            : `Desde ${formatMXN(desde)} al día. Aprobación en 24h. Entrega a domicilio.`
           : "Aprobación en 24h. Entrega a domicilio.",
       ctaPrimary: { label: "Quiero financiarlo", href: `/producto/${p.slug}` },
       ctaSecondary: { label: "Más información", href: `/producto/${p.slug}` },
@@ -90,8 +104,25 @@ export default async function Home() {
     bgGradient: "from-blue-950 via-blue-800 to-blue-900",
   };
 
-  const heroSlides: HeroSlide[] =
-    slidesProductos.length > 0 ? slidesProductos : [slideSAI];
+  // Slide de la promo, primero en el carrusel mientras dure.
+  const slidePromo: HeroSlide = {
+    eyebrow: "EL GRAN FIN · 4 AL 7 DE NOV",
+    badge: "0% de enganche",
+    title: "Toda la tienda sin enganche",
+    subtitle: promoActiva
+      ? "Solo del 4 al 7 de noviembre. Financias el 100% y pagas en semanas."
+      : "Del 4 al 7 de noviembre. ¡Espéralo pronto!",
+    ctaPrimary: { label: "Ver artículos sin enganche", href: "/sin-enganche" },
+    ctaSecondary: { label: "Ver catálogo", href: "/productos" },
+    image: PROMO_SIN_ENGANCHE.flyer,
+    imageAlt: `Flyer ${PROMO_SIN_ENGANCHE.nombre}: 0% de enganche`,
+    bgGradient: "from-blue-950 via-blue-800 to-blue-900",
+  };
+
+  const heroSlides: HeroSlide[] = [
+    ...(mostrarPromo ? [slidePromo] : []),
+    ...(slidesProductos.length > 0 ? slidesProductos : [slideSAI]),
+  ];
 
   // "Más solicitados": destacados generales, excluyendo los que ya salen en el
   // carrusel para no repetir producto.
@@ -107,9 +138,23 @@ export default async function Home() {
       <main className="flex-1">
         <HeroCarousel slides={heroSlides} />
 
-        {/* La barra se superpone al carrusel, pero poco: con el marco blanco
-            del hero un traslape grande hacía que se tocaran los bordes. */}
-        <section className="relative z-20 mx-auto -mt-6 max-w-6xl px-4 md:-mt-8 md:px-6">
+        {/* Durante la promo, su banner va primero y es el que se superpone al
+            carrusel; la barra de beneficios baja a continuación. */}
+        {mostrarPromo && (
+          <PromoSinEnganche
+            fase={fasePromo}
+            className="relative z-20 -mt-6 md:-mt-8"
+          />
+        )}
+
+        {/* Sin promo, la barra se superpone al carrusel, pero poco: con el
+            marco blanco del hero un traslape grande hacía que se tocaran. */}
+        <section
+          className={cn(
+            "relative z-20 mx-auto max-w-6xl px-4 md:px-6",
+            mostrarPromo ? "mt-8" : "-mt-6 md:-mt-8"
+          )}
+        >
           <div className="grid gap-4 rounded-2xl border bg-card/95 p-4 shadow-xl backdrop-blur-md md:grid-cols-4 md:p-6">
             {[
               {

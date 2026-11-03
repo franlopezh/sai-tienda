@@ -8,6 +8,7 @@ import {
   type PlanCredito,
 } from "@/lib/credito";
 import { formatMXN } from "@/lib/format";
+import { PROMO_SIN_ENGANCHE } from "@/lib/promo";
 import type { Producto } from "@/lib/types";
 import { LeadModal } from "@/components/lead-modal";
 import { cn } from "@/lib/utils";
@@ -17,23 +18,32 @@ type Props = {
   /** Slug de la categoría del producto. Se usa para aplicar reglas de plazos
    * por categoría (p. ej. las motos ya no ofrecen el plazo de 15 meses). */
   categoriaSlug?: string | null;
+  /** Si la promo de 0% de enganche está vigente. Lo calcula la página en el
+   * servidor para que el HTML y la hidratación usen el mismo reloj. */
+  promoActiva: boolean;
 };
 
 function formatPlazo(meses: number): string {
   return Number.isInteger(meses) ? `${meses} meses` : `${meses} meses`;
 }
 
-export function SimuladorCredito({ producto, categoriaSlug }: Props) {
+export function SimuladorCredito({
+  producto,
+  categoriaSlug,
+  promoActiva,
+}: Props) {
   const precio = getPrecioPublico(producto);
   const planes = useMemo(
-    () => calcularPlanes(precio, categoriaSlug),
-    [precio, categoriaSlug]
+    () => calcularPlanes(precio, categoriaSlug, promoActiva),
+    [precio, categoriaSlug, promoActiva]
   );
   const planDefault =
     planes.find((p) => p.plazo === getPlazoDefault(precio)) ?? planes[0];
   const [seleccionado, setSeleccionado] = useState<PlanCredito>(planDefault);
 
   if (!precio || precio <= 0 || planes.length === 0) return null;
+
+  const sinEnganche = planes.some((p) => p.sinEnganche);
 
   const gridCols =
     planes.length === 4
@@ -47,8 +57,22 @@ export function SimuladorCredito({ producto, categoriaSlug }: Props) {
           Simula tu crédito
         </h2>
         <p className="mt-1 text-xs text-muted-foreground">
-          Elige el plazo que mejor se acomode. El enganche es del 10% del total.
+          {sinEnganche
+            ? "Elige el plazo que mejor se acomode. Financias el 100% del total."
+            : "Elige el plazo que mejor se acomode. El enganche es del 10% del total."}
         </p>
+        {sinEnganche && (
+          <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 dark:border-red-500/40 dark:bg-red-950/40">
+            <p className="text-sm font-semibold text-red-700 dark:text-red-300">
+              🎉 Promoción {PROMO_SIN_ENGANCHE.nombre}: llévatelo con 0% de
+              enganche, {PROMO_SIN_ENGANCHE.fechas}.
+            </p>
+            <p className="mt-1 text-[11px] leading-relaxed text-red-900/80 dark:text-red-200/80">
+              <strong>{PROMO_SIN_ENGANCHE.disclaimerTitulo}:</strong>{" "}
+              {PROMO_SIN_ENGANCHE.disclaimer}
+            </p>
+          </div>
+        )}
       </header>
 
       <div className={cn("grid gap-3", gridCols)}>
@@ -109,9 +133,15 @@ export function SimuladorCredito({ producto, categoriaSlug }: Props) {
                 </div>
                 <div className="flex items-center justify-between">
                   <dt className="text-muted-foreground">Enganche</dt>
-                  <dd className="font-mono font-medium tabular-nums text-foreground">
-                    {formatMXN(plan.enganche)}
-                  </dd>
+                  {plan.sinEnganche ? (
+                    <dd className="font-mono font-bold tabular-nums text-red-600 dark:text-red-400">
+                      $0
+                    </dd>
+                  ) : (
+                    <dd className="font-mono font-medium tabular-nums text-foreground">
+                      {formatMXN(plan.enganche)}
+                    </dd>
+                  )}
                 </div>
                 <div className="flex items-center justify-between">
                   <dt className="text-muted-foreground">Total</dt>

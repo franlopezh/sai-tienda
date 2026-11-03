@@ -24,6 +24,7 @@ import { supabase } from "@/lib/supabase";
 import { formatMXN, buildWhatsAppLink } from "@/lib/format";
 import type { Producto } from "@/lib/types";
 import type { PlanCredito } from "@/lib/credito";
+import { PROMO_SIN_ENGANCHE } from "@/lib/promo";
 
 // Fallback por si falla la lectura de ejecutivos_publicos. La lista real se
 // carga desde la BD (misma tabla que el ruteo por WhatsApp), así el menú y la
@@ -172,7 +173,9 @@ export function LeadModal({
         ? [
             `• Plan: ${planSeleccionado.plazoMeses} meses (${planSeleccionado.semanas} semanas)`,
             `• Pago: ${formatMXN(planSeleccionado.pagoSemanal)} / semana · ${formatMXN(planSeleccionado.pagoDiario)} / día`,
-            `• Enganche: ${formatMXN(planSeleccionado.enganche)}`,
+            planSeleccionado.sinEnganche
+              ? `• Enganche: $0 (promoción ${PROMO_SIN_ENGANCHE.nombre}, sujeta a evaluación)`
+              : `• Enganche: ${formatMXN(planSeleccionado.enganche)}`,
             `• Total a pagar: ${formatMXN(planSeleccionado.total)}`,
           ]
         : [`• Pago: ${formatMXN(pagoSemanal)} a ${semanas} semanas`];
@@ -216,7 +219,9 @@ export function LeadModal({
       >
         {ctaLabel ?? (compact ? "💬 Financiar" : "💬 Quiero financiarlo")}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      {/* Tope de alto + scroll: con el aviso legal de la promo el formulario
+          no cabía en celulares chicos y el botón de enviar quedaba fuera. */}
+      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-3 rounded-lg border bg-muted/50 p-3 dark:bg-zinc-900/40">
             <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white">
@@ -243,6 +248,11 @@ export function LeadModal({
                 <p className="text-xs text-muted-foreground">
                   Plan {planSeleccionado.plazoMeses} meses ·{" "}
                   {formatMXN(planSeleccionado.pagoSemanal)} / semana
+                  {planSeleccionado.sinEnganche && (
+                    <span className="font-semibold text-red-600 dark:text-red-400">
+                      {" "}· 0% de enganche
+                    </span>
+                  )}
                 </p>
               ) : (
                 <p className="text-xs text-muted-foreground">
@@ -255,6 +265,12 @@ export function LeadModal({
             Estás solicitando información para este producto. Un ejecutivo te
             contactará por WhatsApp.
           </p>
+          {planSeleccionado?.sinEnganche && (
+            <p className="text-[11px] leading-relaxed text-muted-foreground">
+              <strong>{PROMO_SIN_ENGANCHE.disclaimerTitulo}:</strong>{" "}
+              {PROMO_SIN_ENGANCHE.disclaimer}
+            </p>
+          )}
         </DialogHeader>
 
         <div className="grid gap-4 pt-2">

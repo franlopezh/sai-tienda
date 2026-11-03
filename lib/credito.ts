@@ -8,6 +8,10 @@
 //      total_a_financiar = total * 90%
 //      pago_semanal     = total_a_financiar / semanas
 //      pago_diario      = total_a_financiar / dias (≈ pago_semanal / 6)
+//   Durante la promo "sin enganche" (lib/promo.ts) los segmentos participantes
+//   llevan enganche 0 y total_a_financiar = total.
+
+import { PROMO_SIN_ENGANCHE, promoSinEngancheActiva } from "./promo";
 
 export type Segmento = "pequenos" | "medianos" | "grandes";
 
@@ -21,6 +25,8 @@ export type PlanCredito = {
   segmento: Segmento;
   total: number;
   enganche: number;
+  /** True cuando la promo de 0% de enganche aplica a este plan. */
+  sinEnganche: boolean;
   totalAFinanciar: number;
   pagoSemanal: number;
   pagoDiario: number;
@@ -107,15 +113,20 @@ export function getPlazosDisponibles(precio: number): number[] {
   return CONFIG_POR_SEGMENTO[getSegmento(precio)].map((c) => c.plazo);
 }
 
+// `promoActiva` vale por defecto lo que diga el reloj de quien llama. Los
+// componentes cliente deben recibirlo del servidor (ver SimuladorCredito).
 export function calcularPlan(
   precio: number,
-  plazo: number
+  plazo: number,
+  promoActiva: boolean = promoSinEngancheActiva()
 ): PlanCredito | null {
   const segmento = getSegmento(precio);
   const config = CONFIG_POR_SEGMENTO[segmento].find((c) => c.plazo === plazo);
   if (!config) return null;
+  const sinEnganche =
+    promoActiva && PROMO_SIN_ENGANCHE.segmentos.includes(segmento);
   const total = precio * config.multiplicador;
-  const enganche = total * ENGANCHE_PCT;
+  const enganche = sinEnganche ? 0 : total * ENGANCHE_PCT;
   const totalAFinanciar = total - enganche;
   const pagoSemanal = totalAFinanciar / config.semanas;
   const pagoDiario = pagoSemanal / DIAS_POR_SEMANA;
@@ -129,6 +140,7 @@ export function calcularPlan(
     segmento,
     total,
     enganche,
+    sinEnganche,
     totalAFinanciar,
     pagoSemanal,
     pagoDiario,
@@ -137,7 +149,8 @@ export function calcularPlan(
 
 export function calcularPlanes(
   precio: number,
-  categoriaSlug?: string | null
+  categoriaSlug?: string | null,
+  promoActiva: boolean = promoSinEngancheActiva()
 ): PlanCredito[] {
   const segmento = getSegmento(precio);
   const excluidos = categoriaSlug
@@ -145,11 +158,21 @@ export function calcularPlanes(
     : [];
   return CONFIG_POR_SEGMENTO[segmento]
     .filter((c) => !excluidos.includes(c.plazo))
-    .map((c) => calcularPlan(precio, c.plazo))
+    .map((c) => calcularPlan(precio, c.plazo, promoActiva))
     .filter((p): p is PlanCredito => p !== null);
 }
 
 // Plan por defecto a usar en cards y vistas previas.
-export function calcularPlanDefault(precio: number): PlanCredito | null {
-  return calcularPlan(precio, getPlazoDefault(precio));
+export function calcularPlanDefault(
+  precio: number,
+  promoActiva: boolean = promoSinEngancheActiva()
+): PlanCredito | null {
+  return calcularPlan(precio, getPlazoDefault(precio), promoActiva);
+}
+
+/** True si este precio entra en la promo de 0% de enganche (esté o no activa). */
+export function participaEnPromoSinEnganche(precio: number): boolean {
+  return (
+    precio > 0 && PROMO_SIN_ENGANCHE.segmentos.includes(getSegmento(precio))
+  );
 }

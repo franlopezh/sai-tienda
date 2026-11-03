@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 
 export type HeroSlide = {
   eyebrow: string;
+  /** Etiqueta roja junto al eyebrow (p. ej. la promo de 0% de enganche). */
+  badge?: string;
   title: string;
   subtitle: string;
   ctaPrimary: { label: string; href: string };
@@ -76,9 +78,18 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
                   {/* En mobile: imagen va primero (arriba), texto después.
                       En md+: texto a la izq, imagen a la der (orden natural). */}
                   <div className="order-2 pb-56 text-center md:order-1 md:pt-32 md:pb-64 md:text-left">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-200">
-                      {slide.eyebrow}
-                    </p>
+                    {/* Badge en la misma línea que el eyebrow: no suma altura
+                        y el spacer de abajo sigue valiendo. */}
+                    <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
+                      {slide.badge && (
+                        <span className="rounded-full bg-red-600 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white shadow-md">
+                          {slide.badge}
+                        </span>
+                      )}
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-200">
+                        {slide.eyebrow}
+                      </p>
+                    </div>
                     <h2 className="mt-2 text-2xl font-semibold tracking-tight md:mt-3 md:text-5xl md:leading-tight lg:text-6xl">
                       {slide.title}
                     </h2>
@@ -172,12 +183,14 @@ export function HeroCarousel({ slides, intervalMs = 6000 }: Props) {
           </>
         )}
 
-        {/* Dots */}
+        {/* Dots. En md+ van alineados a la columna de texto (bajo los
+            botones): centrados, con muchos slides se metían detrás del marco
+            blanco de la foto. El left replica el max-w-6xl + padding del grid. */}
         {slides.length > 1 && (
           <div
             role="tablist"
             aria-label="Slides"
-            className="absolute bottom-32 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 md:bottom-40"
+            className="absolute bottom-32 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 md:bottom-40 md:left-12 md:translate-x-0 lg:left-[calc(max(0px,(100%_-_72rem)/2)_+_4rem)]"
           >
             {slides.map((_, idx) => (
               <button

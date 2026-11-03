@@ -6,6 +6,7 @@ import { WhatsAppFab } from "@/components/whatsapp-fab";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { LavaBackground } from "@/components/lava-background";
+import { PromoVideoIntro } from "@/components/promo-video-intro";
 
 const sans = DM_Sans({
   variable: "--font-geist-sans",
@@ -63,6 +64,7 @@ export default function RootLayout({
           <LavaBackground />
           {children}
           <WhatsAppFab />
+          <PromoVideoIntro />
         </ThemeProvider>
       </body>
     </html>

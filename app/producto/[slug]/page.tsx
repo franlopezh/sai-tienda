@@ -16,6 +16,7 @@ import {
   getCategoriaById,
 } from "@/lib/queries";
 import { calcularPlanDefault, getPrecioPublico } from "@/lib/credito";
+import { promoSinEngancheActiva } from "@/lib/promo";
 import { ProductCard } from "@/components/product-card";
 
 type Params = Promise<{ slug: string }>;
@@ -104,8 +105,9 @@ export default async function ProductoPage({ params }: { params: Params }) {
       ? [producto.imagen_url]
       : [];
 
+  const promoActiva = promoSinEngancheActiva();
   const precioPublico = getPrecioPublico(producto);
-  const planDefault = calcularPlanDefault(precioPublico);
+  const planDefault = calcularPlanDefault(precioPublico, promoActiva);
   const pagoSemanal = planDefault?.pagoSemanal ?? 0;
   const pagoDiario = planDefault?.pagoDiario ?? 0;
   const semanasEstimadas = planDefault?.semanas ?? 52;
@@ -271,6 +273,7 @@ export default async function ProductoPage({ params }: { params: Params }) {
                 <SimuladorCredito
                   producto={producto}
                   categoriaSlug={categoria?.slug}
+                  promoActiva={promoActiva}
                 />
               )}
             </div>
@@ -372,6 +375,11 @@ export default async function ProductoPage({ params }: { params: Params }) {
                   {Number.isInteger(plazoMeses) ? `${plazoMeses}m` : `${plazoMeses}m`}
                 </span>
               )}
+              {planDefault?.sinEnganche && (
+                <span className="rounded-full bg-red-600 px-1.5 py-0.5 text-[9px] font-bold uppercase text-white">
+                  0% eng.
+                </span>
+              )}
             </div>
           </div>
           <div className="shrink-0">
@@ -379,6 +387,7 @@ export default async function ProductoPage({ params }: { params: Params }) {
               producto={producto}
               pagoSemanal={pagoSemanal}
               semanas={semanasEstimadas}
+              planSeleccionado={planDefault}
               compact
             />
           </div>

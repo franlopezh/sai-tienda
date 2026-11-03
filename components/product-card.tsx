@@ -2,18 +2,29 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 import { formatMXN } from "@/lib/format";
-import { calcularPlanDefault, getPrecioPublico } from "@/lib/credito";
+import {
+  calcularPlanDefault,
+  getPrecioPublico,
+  type PlanCredito,
+} from "@/lib/credito";
 import { cn } from "@/lib/utils";
 import type { Producto } from "@/lib/types";
 
 const DIAS_NUEVO = 30;
 
-function getBadge(p: Producto): { label: string; tone: string } | null {
+function getBadge(
+  p: Producto,
+  plan: PlanCredito | null
+): { label: string; tone: string } | null {
   // `agotado` lo calcula la BD por categoria: celulares/tecnologia se agotan
   // por stock; motos/llantas nunca (se consulta al proveedor). Incluye tambien
   // los productos inactivos.
   if (p.agotado) {
     return { label: "Agotado", tone: "bg-zinc-700/90 text-white" };
+  }
+  // Promo temporal de 0% de enganche (lib/promo.ts). Rojo como el flyer.
+  if (plan?.sinEnganche) {
+    return { label: "0% enganche", tone: "bg-red-600 text-white" };
   }
   const ahora = Date.now();
   const creado = p.created_at ? Date.parse(p.created_at) : 0;
@@ -22,9 +33,9 @@ function getBadge(p: Producto): { label: string; tone: string } | null {
   if (esNuevo) {
     return { label: "Nuevo", tone: "bg-blue-600 text-white" };
   }
-  // No hay badge "Sin enganche": el crédito siempre aplica 10% de enganche
-  // calculado sobre precio_credito (ver lib/credito.ts). La columna legacy
-  // productos.enganche puede venir NULL/0 y no refleja el enganche real.
+  // Fuera de promo no hay badge "Sin enganche": el crédito aplica 10% de
+  // enganche calculado sobre precio_credito (ver lib/credito.ts). La columna
+  // legacy productos.enganche puede venir NULL/0 y no refleja el enganche real.
   return null;
 }
 
@@ -35,12 +46,12 @@ export function ProductCard({
   producto: Producto;
   index?: number;
 }) {
-  const badge = getBadge(producto);
   const agotado = producto.agotado === true;
   const animationDelay = `${Math.min(index, 11) * 50}ms`;
 
   const precio = getPrecioPublico(producto);
   const plan = precio > 0 ? calcularPlanDefault(precio) : null;
+  const badge = getBadge(producto, plan);
   const pagoDiario = plan?.pagoDiario ?? producto.pago_diario ?? 0;
   const pagoSemanal = plan?.pagoSemanal ?? producto.pago_semanal ?? 0;
   const enganche = plan?.enganche ?? producto.enganche ?? 0;
