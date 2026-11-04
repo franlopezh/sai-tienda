@@ -25,9 +25,9 @@ export const PROMO_SIN_ENGANCHE = {
   // (ficha, solicitud, /sin-enganche); el corto en banners (inicio, video).
   disclaimerTitulo: "Aviso legal y condiciones de promoción",
   disclaimer:
-    'Promoción "El Gran Fin" válida únicamente durante el periodo del 4 al 7 de noviembre de 2026 o hasta agotar existencias. Oferta sujeta a la disponibilidad de inventario al momento de procesar la solicitud. Beneficio exclusivo para clientes seleccionados, sujeto a evaluación y aprobación previa con base en el historial de créditos y comportamiento de pago registrado con la empresa. Aplican restricciones y criterios internos de crédito. Nos reservamos el derecho de modificar o cancelar los términos de esta promoción en cualquier momento sin previo aviso.',
+    'Promoción "El Gran Fin" válida únicamente durante el periodo del 4 al 7 de noviembre de 2026 o hasta agotar existencias. Oferta sujeta a la disponibilidad de inventario al momento de procesar la solicitud. Beneficio exclusivo para clientes seleccionados, sujeto a evaluación y aprobación previa con base en el historial de créditos y comportamiento de pago registrado con la empresa. Aplican restricciones y criterios internos de crédito. Los plazos y precios pueden variar. Nos reservamos el derecho de modificar o cancelar los términos de esta promoción en cualquier momento sin previo aviso.',
   disclaimerCorto:
-    "Válido del 4 al 7 de noviembre de 2026 o hasta agotar existencias. Sujeto a disponibilidad de inventario. Beneficio aplicable exclusivamente según la evaluación del historial de créditos del cliente con la empresa y sujeto a políticas internas de crédito. Aplican restricciones.",
+    "Válido del 4 al 7 de noviembre de 2026 o hasta agotar existencias. Sujeto a disponibilidad de inventario. Beneficio aplicable exclusivamente según la evaluación del historial de créditos del cliente con la empresa y sujeto a políticas internas de crédito. Los plazos y precios pueden variar. Aplican restricciones.",
   flyer: "/promo/sin-enganche-flyer.jpg",
   video: "/promo/sin-enganche-video.mp4",
   videoPoster: "/promo/sin-enganche-video-poster.jpg",
