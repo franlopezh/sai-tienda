@@ -18,6 +18,7 @@ import {
 import { calcularPlanDefault, getPrecioPublico } from "@/lib/credito";
 import { promoSinEngancheActiva } from "@/lib/promo";
 import { ProductCard } from "@/components/product-card";
+import { etiquetaColor, swatchFondo } from "@/lib/colores";
 
 type Params = Promise<{ slug: string }>;
 
@@ -45,47 +46,6 @@ function parseDescripcion(desc: string): {
   }
 
   return { specs, texto: otrasLineas.join("\n") };
-}
-
-/**
- * Mapea nombres de color comunes (en español) a un color CSS para el puntito
- * de muestra junto al chip. Si no se reconoce, se usa un gris neutro.
- */
-function swatchColor(nombre: string): string {
-  const n = nombre
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .trim();
-  const mapa: Record<string, string> = {
-    negro: "#1a1a1a",
-    blanco: "#f5f5f5",
-    gris: "#9ca3af",
-    plata: "#c0c0c0",
-    plateado: "#c0c0c0",
-    dorado: "#d4af37",
-    oro: "#d4af37",
-    azul: "#2563eb",
-    "azul claro": "#60a5fa",
-    "azul oscuro": "#1e3a8a",
-    celeste: "#7dd3fc",
-    rojo: "#dc2626",
-    rosa: "#ec4899",
-    rosado: "#ec4899",
-    verde: "#16a34a",
-    "verde menta": "#6ee7b7",
-    amarillo: "#facc15",
-    naranja: "#f97316",
-    morado: "#7c3aed",
-    violeta: "#8b5cf6",
-    "violeta claro": "#c4b5fd",
-    lila: "#c4b5fd",
-    cafe: "#92400e",
-    marron: "#92400e",
-    beige: "#e7d8c0",
-    turquesa: "#14b8a6",
-  };
-  return mapa[n] ?? "#9ca3af";
 }
 
 export default async function ProductoPage({ params }: { params: Params }) {
@@ -311,9 +271,9 @@ export default async function ProductoPage({ params }: { params: Params }) {
                       >
                         <span
                           className="h-3 w-3 shrink-0 rounded-full border border-black/10 shadow-sm dark:border-white/20"
-                          style={{ backgroundColor: swatchColor(c) }}
+                          style={{ background: swatchFondo(c) }}
                         />
-                        {c}
+                        {etiquetaColor(c)}
                       </span>
                     ))}
                   </div>
