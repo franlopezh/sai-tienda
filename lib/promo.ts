@@ -15,8 +15,10 @@ export const PROMO_SIN_ENGANCHE = {
   // Desde cuándo el inicio muestra el flyer y el video ("¡Espéralo pronto!").
   anuncio: new Date("2026-11-03T00:00:00-06:00"),
   inicio: new Date("2026-11-04T00:00:00-06:00"),
-  // Exclusivo: la promo cubre todo el 7 de noviembre.
-  fin: new Date("2026-11-08T00:00:00-06:00"),
+  // Exclusivo: la promo cubre todo el 10 de noviembre (se extendió el 7 de
+  // noviembre; originalmente terminaba el 7). Los textos siguen diciendo
+  // "4 al 7" hasta que el owner mande el flyer y los textos de la extensión.
+  fin: new Date("2026-11-11T00:00:00-06:00"),
   // Segmentos de precio de lib/credito.ts que entran (hoy: todos).
   segmentos: ["pequenos", "medianos", "grandes"] as Segmento[],
   descripcionArticulos: "todos los artículos de la tienda",
